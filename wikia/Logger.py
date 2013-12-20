@@ -2,67 +2,71 @@ import logging
 import logging.handlers
 import json
 
+
 class Logger(logging.getLoggerClass()):
-	def __init__(self, name):
-		super(Logger, self).__init__(name)
-		Logger.__use(self, overwriteMakeRecord=False)
+    def __init__(self, name):
+        super(Logger, self).__init__(name)
+        Logger.__use(self, overwrite_make_record=False)
 
-	def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, func=None, extra=None):
-		return Logger.__makeRecord(name, lvl, fn, lno, msg, args, exc_info, func, extra)
+    def makeRecord(self, name, lvl, fn, lno, msg, args, exc_info, func=None, extra=None):
+        return Logger.__make_record(name, lvl, fn, lno, msg, args, exc_info, func, extra)
 
-	@staticmethod
-	def __makeRecord(name, lvl, fn, lno, msg, args, exc_info, func=None, extra=None):
-		record = LogRecord(name, lvl, fn, lno, msg, args, exc_info, func)
-		record.setExtra(extra)
-		return record
+    @staticmethod
+    def __make_record(name, lvl, fn, lno, msg, args, exc_info, func=None, extra=None):
+        record = LogRecord(name, lvl, fn, lno, msg, args, exc_info, func)
+        record.set_extra(extra)
+        return record
 
-	@staticmethod
-	def use(logger, level=None):
-		return Logger.__use(logger, level)
-	
-	@staticmethod
-	def __use(logger, level=None, overwriteMakeRecord=True):
-		handler = logging.handlers.SysLogHandler(address='/dev/log')
-		handler.setFormatter(LogFormatter())
+    @staticmethod
+    def use(logger, level=None):
+        return Logger.__use(logger, level)
 
-		if level is not None:
-			handler.setLevel(level)
+    @staticmethod
+    def __use(logger, level=None, overwrite_make_record=True):
+        handler = logging.handlers.SysLogHandler(address='/dev/log')
+        handler.setFormatter(LogFormatter())
 
-		logger.addHandler(handler)
+        if level is not None:
+            handler.setLevel(level)
 
-		if overwriteMakeRecord:
-			logger.makeRecord = Logger.__makeRecord
-		
-		return logger
+        logger.addHandler(handler)
 
-	@staticmethod
-	def get(name='WikiaLogger', appName='python', level=None):
-		current = logging.getLoggerClass()
-		logging.setLoggerClass(Logger)
-		logger = logging.getLogger(name);
-		LogRecord.APP_NAME = appName
-		
-		if level is not None:
-			logger.setLevel(level)
+        if overwrite_make_record:
+            logger.makeRecord = Logger.__make_record
 
-		logging.setLoggerClass(current)
-		return logger
+        return logger
+
+    @staticmethod
+    def get(name='WikiaLogger', app_name='python', level=None):
+        current = logging.getLoggerClass()
+        logging.setLoggerClass(Logger)
+        logger = logging.getLogger(name)
+        LogRecord.APP_NAME = app_name
+
+        if level is not None:
+            logger.setLevel(level)
+
+        logging.setLoggerClass(current)
+        return logger
+
 
 class LogFormatter(logging.Formatter):
-	def format(self, record):
-		logObj = { "@message": record.msg }
+    def format(self, record):
+        log_obj = {"@message": record.msg}
 
-		if record.extra is not None:
-			logObj["@fields"] = record.extra
-			
-		result = ''.join([LogRecord.APP_NAME, ': ', json.dumps(logObj)])
-		return result
+        if record.extra is not None:
+            log_obj["@fields"] = record.extra
+
+        result = ''.join([LogRecord.APP_NAME, ': ', json.dumps(log_obj)])
+        return result
+
 
 class LogRecord(logging.LogRecord):
-	APP_NAME = 'python'
+    APP_NAME = 'python'
 
-	def __init__(self, *args, **kwargs):
-		logging.LogRecord.__init__(self, *args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        logging.LogRecord.__init__(self, *args, **kwargs)
+        self.extra = None
 
-	def setExtra(self, extra):
-		self.extra = extra
+    def set_extra(self, extra):
+        self.extra = extra
