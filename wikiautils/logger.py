@@ -41,7 +41,7 @@ class Logger(logging.getLoggerClass()):
         current = logging.getLoggerClass()
         logging.setLoggerClass(Logger)
         logger = logging.getLogger(name)
-        LogRecord.APP_NAME = app_name
+        LogRecord.app_name = app_name
 
         if level is not None:
             logger.setLevel(level)
@@ -62,7 +62,7 @@ class LogFormatter(logging.Formatter):
 
 
 class LogRecord(logging.LogRecord):
-    APP_NAME = 'python'
+    app_name = 'python'
 
     def __init__(self, *args, **kwargs):
         logging.LogRecord.__init__(self, *args, **kwargs)
