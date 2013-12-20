@@ -57,7 +57,7 @@ class LogFormatter(logging.Formatter):
         if record.extra is not None:
             log_obj["@fields"] = record.extra
 
-        result = ''.join([LogRecord.APP_NAME, ': ', json.dumps(log_obj)])
+        result = ''.join([LogRecord.app_name, ': ', json.dumps(log_obj)])
         return result
 
 
