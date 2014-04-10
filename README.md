@@ -1,4 +1,4 @@
-python-backend
-==============
+python-wikiautils
+=================
 
-Repository for python library code shared between projects at wikia
+This repository contains various utilities to be shared between Python projects at Wikia.

@@ -52,10 +52,10 @@ class Logger(logging.getLoggerClass()):
 
 class LogFormatter(logging.Formatter):
     def format(self, record):
-        log_obj = {"@message": record.msg}
+        log_obj = {'@message': record.msg}
 
         if record.extra is not None:
-            log_obj["@fields"] = record.extra
+            log_obj['@fields'] = record.extra
 
         result = ''.join([LogRecord.app_name, ': ', json.dumps(log_obj)])
         return result
