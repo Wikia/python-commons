@@ -6,5 +6,6 @@ setup(
     description='Utilities to be shared between Python projects at Wikia',
     author='Wikia Engineering',
     author_email='techteam-l@wikia-inc.com',
-    packages=['wikiautils'],
+    install_requires=['configparser', 'pylint'],
+    packages=['wikiautils']
 )

@@ -23,7 +23,7 @@ reports = no
 # Regular expression for global variable names
 const-rgx = ([a-z_][a-z0-9_]{2,30})|(__.*__)
 # Good variable names which should always be accepted
-good-names = i,j,k,ex,fn,_
+good-names = i,j,k,ex,fn,fp,_
 
 [FORMAT]
 # Maximum number of characters on a single line
