@@ -33,6 +33,7 @@ import configparser
 
 __all__ = ['ConfigParser']
 
+
 class ExtendedInterpolation(configparser.ExtendedInterpolation):
     """Subclass of `configparser.ExtendedInterpolation`"""
 
@@ -43,12 +44,15 @@ class ExtendedInterpolation(configparser.ExtendedInterpolation):
         value = re.sub(r'\$\{([^}\:]+)\}', r'${' + section + r':\1}', value)
         return super(ExtendedInterpolation, self).before_get(parser, section, option, value, defaults)
 
+
 class ConfigParser(configparser.ConfigParser):
     """Subclass of `configparser.ConfigParser`"""
 
     def __init__(self, *args, **kwargs):
-        kwargs.update(dict(interpolation=ExtendedInterpolation(),
-            delimiters=('='), comment_prefixes=('#'), inline_comment_prefixes=('#')))
+        kwargs.update(dict(
+            interpolation=ExtendedInterpolation(),
+            delimiters=('='), comment_prefixes=('#'), inline_comment_prefixes=('#')
+        ))
         super(ConfigParser, self).__init__(*args, **kwargs)
 
     @staticmethod
