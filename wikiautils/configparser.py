@@ -147,3 +147,10 @@ class ConfigParser(configparser.ConfigParser):
     def write(self, *args, **kwargs):
         del args, kwargs
         raise AttributeError("'ConfigParser' object has no attribute 'write'")
+
+    def read_docstring(self, obj):
+        r"""Reads config values from the second part of an object's docstring split once by `\n---\n`"""
+        parts = obj.__doc__.split('\n---\n', 1)
+        if len(parts) < 2 or not parts[1]:
+            return
+        return self.read_string(unicode(parts[1]))
