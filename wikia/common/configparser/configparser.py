@@ -2,11 +2,13 @@
 configparser.py
 ===============
 
-This module extends the configparser backport from Python 3.2+: <https://pypi.python.org/pypi/configparser>
+This module extends the configparser backport from Python 3.2+:
+<https://pypi.python.org/pypi/configparser>
 
-It adds duck typing by assuming all config values are JSON strings. It also provides a helper function
-for getting a list of config files from standard locations. See the docstrings in the methods below
-for more detailed information.
+It adds duck typing by assuming all config values are JSON strings. It
+also provides a helper function for getting a list of config files from
+standard locations. See the docstrings in the methods below for more
+detailed information.
 
 ## Basic Usage
 
@@ -24,25 +26,22 @@ import glob
 import json
 import os
 import re
-import sys
-
-# This is a little hack to prevent the module from trying to import itself
-del sys.path[0]
 
 import configparser
-
-__all__ = ['ConfigParser']
 
 
 class ExtendedInterpolation(configparser.ExtendedInterpolation):
     """Subclass of `configparser.ExtendedInterpolation`"""
 
     def before_get(self, parser, section, option, value, defaults):
-        # There's a problem in `configparser.ExtendedInterpolation` for options that reference other options without
-        # specifying the section. The custom `get()` function in `ConfigParser` further down in this file is not used.
-        # The solution is to add the section when it's not present.
+        # There's a problem in `configparser.ExtendedInterpolation` for
+        # options that reference other options without specifying the
+        # section. The custom `get()` function in `ConfigParser` further
+        # down in this file is not used. The solution is to add the
+        # section when it's not present.
         value = re.sub(r'\$\{([^}\:]+)\}', r'${' + section + r':\1}', value)
-        return super(ExtendedInterpolation, self).before_get(parser, section, option, value, defaults)
+        return super(ExtendedInterpolation, self).before_get(
+            parser, section, option, value, defaults)
 
 
 class ConfigParser(configparser.ConfigParser):
@@ -57,16 +56,21 @@ class ConfigParser(configparser.ConfigParser):
 
     @staticmethod
     def get_paths(app, names=None):
-        """Generates a list of standard paths from which we should read config files
+        """Generates a list of standard paths of config files
 
-        For example, for `app='foo'`, the following files are looked for in this order:
+        For example, for `app='foo'`, the following files are looked for
+        in this order:
+
         - /etc/foo/foo.conf
         - /etc/foo/conf.d/*.conf
         - the environment variable FOO_CONFIG
         - ~/.foo.conf
 
-        The optional `names` argument can be list of additional names to look for in `/etc/{app}/`.
-        For example, for `app='foo', names=['foo', 'bar', 'baz']`, the following files are looked for in this order:
+        The optional `names` argument can be list of additional names to
+        look for in `/etc/{app}/`. For example, for
+        `app='foo', names=['foo', 'bar', 'baz']`, the following files
+        are looked for in this order:
+
         - /etc/foo/foo.conf
         - /etc/foo/bar.conf
         - /etc/foo/baz.conf
@@ -74,7 +78,8 @@ class ConfigParser(configparser.ConfigParser):
         - the environment variable FOO_CONFIG
         - ~/.foo.conf
 
-        This method **only** returns the list of files. If you want to actually load them, use `read()`.
+        This method **only** returns the list of files. If you want to
+        actually load them, use `read()`.
         """
         pattern = r'^[A-Za-z][A-Za-z0-9_\-]{2,}$'
         if not re.match(pattern, app):
@@ -149,7 +154,8 @@ class ConfigParser(configparser.ConfigParser):
         raise AttributeError("'ConfigParser' object has no attribute 'write'")
 
     def read_docstring(self, obj):
-        r"""Reads config values from the second part of an object's docstring split once by `\n---\n`"""
+        r"""Reads config values from the second part of an object's
+        docstring split once by `\n---\n`"""
         parts = obj.__doc__.split('\n---\n', 1)
         if len(parts) < 2 or not parts[1]:
             return

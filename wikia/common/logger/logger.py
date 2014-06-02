@@ -1,9 +1,13 @@
+"""Common logging classes for centralized logging at Wikia"""
+
 import logging
 import logging.handlers
 import json
 
 
 class Logger(logging.getLoggerClass()):
+    """Represents a logging channel"""
+
     def __init__(self, name):
         super(Logger, self).__init__(name)
         Logger.__use(self, overwrite_make_record=False)
@@ -51,6 +55,8 @@ class Logger(logging.getLoggerClass()):
 
 
 class LogFormatter(logging.Formatter):
+    """Converts a LogRecord to text"""
+
     def format(self, record):
         log_obj = {'@message': record.msg}
 
@@ -62,6 +68,8 @@ class LogFormatter(logging.Formatter):
 
 
 class LogRecord(logging.LogRecord):
+    """Represents an event being logged"""
+
     app_name = 'python'
 
     def __init__(self, *args, **kwargs):
