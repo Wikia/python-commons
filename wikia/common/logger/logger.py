@@ -1,9 +1,10 @@
 """Common logging classes for centralized logging at Wikia"""
 
+import json
 import logging
 import logging.handlers
-import json
 import sys
+
 
 class Logger(logging.getLoggerClass()):
     """Represents a logging channel"""
