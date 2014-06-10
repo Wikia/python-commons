@@ -1,8 +1,9 @@
 """Common logging classes for centralized logging at Wikia"""
 
+import json
 import logging
 import logging.handlers
-import json
+import sys
 
 
 class Logger(logging.getLoggerClass()):
@@ -27,7 +28,17 @@ class Logger(logging.getLoggerClass()):
 
     @staticmethod
     def __use(logger, level=None, overwrite_make_record=True):
-        handler = logging.handlers.SysLogHandler(address='/dev/log')
+
+        # check for platform to allow for use on other non-linux os
+        platform = sys.platform.lower()
+        if platform == 'darwin':
+            # specific for mac os X
+            address = '/var/run/syslog'
+        else:
+            # for most linux distros
+            address = '/dev/log'
+
+        handler = logging.handlers.SysLogHandler(address=address)
         handler.setFormatter(LogFormatter())
 
         if level is not None:
