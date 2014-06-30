@@ -126,6 +126,8 @@ class ConfigParser(configparser.ConfigParser):
                 return value[1:-1]
             else:
                 return value
+        if value == '':
+            return None
         try:
             return json.loads(value)
         except (TypeError, ValueError):
