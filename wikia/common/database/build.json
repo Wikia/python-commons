@@ -1,0 +1,4 @@
+{
+    "version": "1.0.0",
+    "description": "Classes to read the database YaML files and one to create connections"
+}
