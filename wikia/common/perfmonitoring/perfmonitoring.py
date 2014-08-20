@@ -24,10 +24,16 @@ class InfluxDBSettings(object):
 
     @property
     def is_dev(self):
+        """
+        Is the current environment a development one?
+        """
         return self._environ.get('WIKIA_ENVIRONMENT', 'dev') == 'dev'
 
     @property
     def settings(self):
+        """
+        Return InfluxDB settings for a current environment
+        """
         # TODO: store settings in a better place
         settings = {
             'prod': {
@@ -36,7 +42,7 @@ class InfluxDBSettings(object):
                 "username": 'root',
                 "password": 'root',
                 "database": "site",
-                #"use_udp": True,  # TODO
+                # "use_udp": True,  # TODO
             },
             'dev': {
                 "host": 'graph-s3',
@@ -44,7 +50,7 @@ class InfluxDBSettings(object):
                 "username": 'root',
                 "password": 'root',
                 "database": "test",
-                #"use_udp": True,  # TODO
+                # "use_udp": True,  # TODO
             }
         }
 
