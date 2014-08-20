@@ -20,10 +20,16 @@ class InfluxDBSettings(object):
     Returns settings matching the environment
     """
     def __init__(self, environ=os.environ):
-        self._is_dev = environ.get('WIKIA_ENVIRONMENT', 'dev') == 'dev'
+        self._environ = environ
 
+    @property
+    def is_dev(self):
+        return self._environ.get('WIKIA_ENVIRONMENT', 'dev') == 'dev'
+
+    @property
+    def settings(self):
         # TODO: store settings in a better place
-        self._settings = {
+        settings = {
             'prod': {
                 "host": 'graph-s3',
                 "port": 8086,
@@ -42,14 +48,10 @@ class InfluxDBSettings(object):
             }
         }
 
-    def is_dev(self):
-        return self._is_dev
-
-    def get_settings(self):
-        if self.is_dev():
-            return self._settings['dev']
+        if self.is_dev:
+            return settings['dev']
         else:
-            return self._settings['prod']
+            return settings['prod']
 
 
 class PerfMonitoring(object):
@@ -62,10 +64,10 @@ class PerfMonitoring(object):
         self._series_name = "%s_%s" % (app.lower(), series_name.lower())
         self._metrics = {}
 
-        params = InfluxDBSettings().get_settings()
-        self._logger.debug("Connecting to %s", params)
+        settings = InfluxDBSettings().settings
+        self._logger.debug("Connecting to %s", settings)
 
-        self._influx_db = InfluxDBClient(**params)
+        self._influx_db = InfluxDBClient(**settings)
 
         self._logger.debug("Metrics will be pushed to '%s'", self.get_series_name())
 
@@ -79,13 +81,13 @@ class PerfMonitoring(object):
 
     def set(self, name, value):
         """
-        Sets the value of a givem metric
+        Sets the value of a given metric
         """
         self._metrics[name] = value
 
     def inc(self, name, inc=1):
         """
-        Increments the value of a givem metric
+        Increments the value of a given metric
         """
         if name not in self._metrics:
             self._metrics[name] = 0
