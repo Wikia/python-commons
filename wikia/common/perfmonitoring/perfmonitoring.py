@@ -38,17 +38,11 @@ class InfluxDBSettings(object):
         settings = {
             'prod': {
                 "host": 'graph-s3',
-                "port": 8086,
-                "username": 'root',
-                "password": 'root',
                 "database": "site",
                 # "use_udp": True,  # TODO
             },
             'dev': {
                 "host": 'graph-s3',
-                "port": 8086,
-                "username": 'root',
-                "password": 'root',
                 "database": "test",
                 # "use_udp": True,  # TODO
             }
