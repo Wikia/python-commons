@@ -19,8 +19,11 @@ class InfluxDBSettings(object):
 
     Returns settings matching the environment
     """
-    def __init__(self, environ=os.environ):
-        self._environ = environ
+    def __init__(self, environ=None):
+        if environ is None:
+            self._environ = os.environ
+        else:
+            self._environ = environ
 
     @property
     def is_dev(self):
@@ -34,17 +37,16 @@ class InfluxDBSettings(object):
         """
         Return InfluxDB settings for a current environment
         """
-        # TODO: store settings in a better place
         settings = {
             'prod': {
                 "host": 'graph-s3',
-                "database": "site",
-                # "use_udp": True,  # TODO
+                "udp_port": 4444,
+                "use_udp": True,
             },
             'dev': {
                 "host": 'graph-s3',
-                "database": "test",
-                # "use_udp": True,  # TODO
+                "udp_port": 5551,
+                "use_udp": True,
             }
         }
 
@@ -58,10 +60,10 @@ class PerfMonitoring(object):
     """
     Wraps metrics and pushes them to InfluxDB
     """
-    def __init__(self, app, series_name='metrics'):
+    def __init__(self, app_name, series_name='metrics'):
         self._logger = logging.getLogger('PerfMonitoring')
 
-        self._series_name = "%s_%s" % (app.lower(), series_name.lower())
+        self._series_name = "%s_%s" % (app_name.lower(), series_name.lower())
         self._metrics = {}
 
         settings = InfluxDBSettings().settings
