@@ -5,8 +5,6 @@ perfmonitoring.py
 This module allows you to send performance metrics to InfluxDB
 """
 
-from __future__ import absolute_import
-
 import logging
 import os
 
@@ -60,16 +58,20 @@ class PerfMonitoring(object):
     """
     Wraps metrics and pushes them to InfluxDB
     """
-    def __init__(self, app_name, series_name='metrics'):
+    def __init__(self, app_name, series_name='metrics', influx_db=None):
         self._logger = logging.getLogger('PerfMonitoring')
 
         self._series_name = "%s_%s" % (app_name.lower(), series_name.lower())
         self._metrics = {}
 
-        settings = InfluxDBSettings().settings
-        self._logger.debug("Connecting to %s", settings)
+        if influx_db is None:
+            settings = InfluxDBSettings().settings
+            self._logger.debug("Connecting to %s", settings)
 
-        self._influx_db = InfluxDBClient(**settings)
+            self._influx_db = InfluxDBClient(**settings)
+        else:
+            # handle dependency injection
+            self._influx_db = influx_db
 
         self._logger.debug("Metrics will be pushed to '%s'", self.get_series_name())
 
@@ -95,6 +97,12 @@ class PerfMonitoring(object):
             self._metrics[name] = 0
 
         self._metrics[name] += inc
+
+    def get(self, name, default=None):
+        """
+        Return the value of a given metric (or default if not set)
+        """
+        return self._metrics.get(name, default)
 
     def push(self):
         """
