@@ -1,0 +1,8 @@
+{
+    "version": "1.0.0",
+    "description": "Send performance metrics to InfluxDB",
+    "install_requires": [
+        "influxdb==0.1.11",
+        "mock==1.0.1"
+    ]
+}
