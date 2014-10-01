@@ -12,7 +12,7 @@ detailed information.
 
 ## Basic Usage
 
-    >>> from wikiautils.configparser import ConfigParser
+    >>> from wikia.common.configparser import ConfigParser, NoSectionError, NoOptionError
     >>> config = ConfigParser()
     >>> config.read(config.get_paths('foo'))
     ['/etc/foo/foo.conf']
