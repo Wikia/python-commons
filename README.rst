@@ -26,3 +26,10 @@ Don't run the ``setup.py`` directly. Use the ``build.py`` convenience script::
     Arguments:
 
         <package>   The name of a package directory in wikia/common/
+
+Troubleshooting
+---------------
+
+If developing on a local machine make sure you have the latest version of pip:
+
+    pip install -U pip
