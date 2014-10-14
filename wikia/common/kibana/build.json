@@ -1,0 +1,7 @@
+{
+    "version": "1.0.0",
+    "description": "Run queries against Kibana's Elasticsearch",
+    "install_requires": [
+        "elasticsearch==1.2.0"
+    ]
+}
