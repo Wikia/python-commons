@@ -3,6 +3,6 @@
     "description": "Run queries against Kibana's Elasticsearch",
     "install_requires": [
         "elasticsearch==1.2.0",
-	"python-dateutil==2.2"
+        "python-dateutil==2.2"
     ]
 }
