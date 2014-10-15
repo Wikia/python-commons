@@ -7,7 +7,6 @@ from datetime import datetime
 import dateutil.tz
 import json
 import logging
-import settings
 import time
 
 from elasticsearch import Elasticsearch
@@ -20,7 +19,7 @@ class Kibana(object):
          :arg since: UNIX timestamp data should be fetched since
          :arg period: period (in seconds) before now() to be used when since is empty (defaults to last 15 minutes)
         """
-        self._es = Elasticsearch(hosts=settings.KIBANA_ES_HOSTS)
+        self._es = Elasticsearch(hosts=['lb-s1', 'lb-s2'])
         self._logger = logging.getLogger('kibana')
 
         # if no timestamp provided, fallback to now() in UTC
