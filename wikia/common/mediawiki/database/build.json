@@ -1,0 +1,8 @@
+{
+    "version": "1.0.0",
+    "description": "MediaWiki database library",
+    "install_requires": [
+        "sqlalchemy",
+        "phpserialize"
+    ]
+}
