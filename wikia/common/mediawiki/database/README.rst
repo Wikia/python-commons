@@ -1,7 +1,7 @@
 wikia.common.mediawiki.database
 ===============================
 
-MediaWiki database connector
+MediaWiki database connection manager
 
 Supported features:
 * main sections

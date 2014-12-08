@@ -10,6 +10,7 @@ from config import Config
 
 logger = logging.getLogger('wikia.common.mediawiki.database')
 
+
 class LoadBalancer(object):
     """
     MediaWiki database load balancer
@@ -25,7 +26,7 @@ class LoadBalancer(object):
         Create a connection to target database and return the connection
         """
         logger.debug("get_connection(): connecting: dbname={} type={} groups={}".format(
-            dbname,self.__format_type(type),groups))
+            dbname, self.__format_type(type), groups))
         section = self.config.get_section_by_db(dbname)
         if not section:
             section = self.__get_section_from_wiki_factory(dbname)
@@ -34,7 +35,7 @@ class LoadBalancer(object):
             server.dbname = dbname
         connection = self.__connect_any(servers)
         logger.debug("get_connection(): connected: dbname={} type={} groups={}".format(
-            dbname,self.__format_type(type),groups))
+            dbname, self.__format_type(type), groups))
         return connection
 
     def get_external_connection(self, section, type=SLAVE, groups=None):
@@ -42,11 +43,11 @@ class LoadBalancer(object):
         Create a connection to external database with blobs and return the connection
         """
         logger.debug("get_external_connection(): connecting: section={} type={} groups={}".format(
-            section,self.__format_type(type),groups))
+            section, self.__format_type(type), groups))
         servers = self.config.get_external_section_servers(section, type, groups)
         connection = self.__connect_any(servers)
         logger.debug("get_external_connection(): connected: section={} type={} groups={}".format(
-            section,self.__format_type(type),groups))
+            section, self.__format_type(type), groups))
         return connection
 
     def __get_section_from_wiki_factory(self, dbname):
@@ -76,7 +77,7 @@ class LoadBalancer(object):
         Return first working connection. Otherwise raise an exception.
         """
         logger.debug("__connect_any(): got {} server(s): [{}]".format(len(servers),
-            ', '.join([server for server in servers.keys()])))
+                                                                      ', '.join([server for server in servers.keys()])))
         servers = servers.copy()
         weights = dict([(server.name, server.load) for server in servers.values()])
 
@@ -98,7 +99,7 @@ class LoadBalancer(object):
         Connect to get given server and return the connection if successful. Otherwise an exception is thrown.
         """
         logger.debug("__connect(): trying to connect to {} ({}:{}/{})".format(
-            server.name,server.ip,server.port,server.dbname))
+            server.name, server.ip, server.port, server.dbname))
         charset = 'latin1' if not server.utf8 else 'utf8'
         connect_str = "mysql+mysqldb://{user}:{password}@{ip}/{dbname}?charset={charset}&use_unicode=0".format(
             user=server.user, password=server.password, ip=server.ip, dbname=server.dbname,

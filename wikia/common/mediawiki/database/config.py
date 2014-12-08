@@ -6,6 +6,7 @@ import yaml
 
 builtin_type = type
 
+
 class Config(object):
     """
     Config reader for MediaWiki database load balancer
@@ -50,7 +51,7 @@ class Config(object):
         """
         return self.config[self.SECTIONS_BY_DB].get(dbname)
 
-    def get_section_servers(self, section, type = SLAVE, groups = None):
+    def get_section_servers(self, section, type=SLAVE, groups=None):
         """
         Get a list of servers for the specified criteria in the main pool of databases.
         """
@@ -64,7 +65,7 @@ class Config(object):
 
         return servers
 
-    def get_external_section_servers(self, section, type = SLAVE, groups = None):
+    def get_external_section_servers(self, section, type=SLAVE, groups=None):
         """
         Get a list of servers for the specified criteria in the external pool of databases.
         """
@@ -78,7 +79,7 @@ class Config(object):
 
         return servers
 
-    def __get_section_loads(self, section, type = SLAVE, groups = None):
+    def __get_section_loads(self, section, type=SLAVE, groups=None):
         """
         Get a list of server names and loads for the specified criteria in the main pool.
         """
@@ -90,7 +91,7 @@ class Config(object):
         loads = self.config[self.SECTION_LOADS][section][key]
 
         if type == self.SLAVE and groups is not None:
-            group_loads = self.__get_section_groups_loads(section,groups)
+            group_loads = self.__get_section_groups_loads(section, groups)
             loads = group_loads or loads
 
         return loads
@@ -108,7 +109,7 @@ class Config(object):
 
         return None
 
-    def __get_external_section_loads(self, section, type = SLAVE, groups = None):
+    def __get_external_section_loads(self, section, type=SLAVE, groups=None):
         """
         Get a list of server names and loads for the specified criteria in the external pool.
         """
@@ -147,7 +148,7 @@ class Config(object):
         hostname = name
         port = self.DEFAULT_MYSQL_PORT
         if ':' in name:
-            hostname, port = name.split(':',2)
+            hostname, port = name.split(':', 2)
             port = int(port)
 
         ip = self.config[self.HOSTS_BY_NAME][hostname]
@@ -192,6 +193,7 @@ class Config(object):
                 self.TYPE_MASTERS: masters,
                 self.TYPE_SLAVES: slaves
             }
+
 
 class ServerInfo(object):
     def __init__(self, name, ip, port, dbname, user, password, type, flags, utf8, load, **kwargs):
