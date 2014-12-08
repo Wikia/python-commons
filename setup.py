@@ -25,7 +25,9 @@ if not pkg_name:
         raise Exception('Package to build/install is ambiguous.')
     pkg_name = pkgs[0]
 
-pkg_subdir = os.path.join('wikia', 'common', pkg_name)
+pkg_fs_name = pkg_name.replace('.','/')
+
+pkg_subdir = os.path.join('wikia', 'common', pkg_fs_name)
 if not os.path.isdir(os.path.join(here, pkg_subdir)):
     raise Exception('Package directory "{pkg_subdir}" does not exist'.format(pkg_subdir=pkg_subdir))
 
@@ -39,7 +41,7 @@ setup_params = {
     'name': 'wikia.common.' + pkg_name,
     'author': 'Wikia Engineering',
     'author_email': 'techteam-l@wikia-inc.com',
-    'url': 'https://github.com/Wikia/python-commons/tree/master/wikia/common/' + pkg_name,
+    'url': 'https://github.com/Wikia/python-commons/tree/master/wikia/common/' + pkg_fs_name,
     'namespace_packages': ['wikia', 'wikia.common'],
     'packages': ['wikia.common.' + pkg_name] +
                 ['wikia.common.{0}.{1}'.format(pkg_name, p) for p in find_packages(pkg_subdir)],

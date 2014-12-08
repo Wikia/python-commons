@@ -1,0 +1,11 @@
+{
+    "version": "0.0.1",
+    "description": "MediaWiki database connection manager",
+    "install_requires": [
+        "sqlalchemy",
+        "phpserialize"
+    ],
+    "exclude_package_data": {
+        "": [ "test_console.py", "*.pyc" ]
+    }
+}
