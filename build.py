@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 This is a convenience script for building, installing, and uploading
 individual packages from the wikia.common namespace. This should be run
