@@ -12,6 +12,10 @@ import time
 from elasticsearch import Elasticsearch
 
 
+class KibanaError(Exception):
+    pass
+
+
 class Kibana(object):
     """ Interface for querying Kibana's storage """
     def __init__(self, since=None, period=900):
@@ -98,23 +102,27 @@ class Kibana(object):
 
         :arg match: query to be run against Kibana log messages (ex. {"@message": "Foo Bar DB queries"})
         """
-        self._logger.info("Running %s query (limit set to %d)", json.dumps(match), limit)
+        body = {
+            "query": {
+                "match": match,
+            },
+            "filter": self._get_timestamp_filer(),
+            "size": limit,
+        }
+
+        self._logger.debug("Running %s query (limit set to %d)", json.dumps(body), limit)
 
         data = self._es.search(
             index=self._index,
-            body={
-                "query": {
-                    "match": match,
-                },
-                "filter": self._get_timestamp_filer(),
-                "size": limit,
-            },
-            timeout=120
+            body=body,
         )
+
+        if data['timed_out'] is True:
+            raise KibanaError("The query timed out!")
 
         rows = [entry['_source'] for entry in data['hits']['hits']]
 
-        self._logger.info("%d rows returned", len(rows))
+        self._logger.info("%d rows returned in %d ms", len(rows), data['took'])
         return rows
 
     def get_to_timestamp(self):
