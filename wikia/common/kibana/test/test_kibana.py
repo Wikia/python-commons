@@ -54,11 +54,11 @@ class KibanaTestClass(unittest.TestCase):
     @staticmethod
     def test_get_timestamp_filer():
         instance = Kibana(123456, 60)
-        filter = instance._get_timestamp_filer()
+        res = instance._get_timestamp_filer()
 
-        assert filter['range']['@timestamp'] is not None
-        assert filter['range']['@timestamp']['from'] == '1970-01-02T10:17:37.000Z'
-        assert filter['range']['@timestamp']['to'] is not None
+        assert res['range']['@timestamp'] is not None
+        assert res['range']['@timestamp']['from'] == '1970-01-02T10:17:37.000Z'
+        assert res['range']['@timestamp']['to'] is not None
 
     @staticmethod
     def test_get_search_body():
