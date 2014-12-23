@@ -2,14 +2,16 @@
 Run queries against Kibana's elasticsearch
 @see http://elasticsearch-py.readthedocs.org/en/master/
 """
-
-from datetime import datetime
-import dateutil.tz
 import json
 import logging
 import time
 
+from datetime import datetime
+from dateutil import tz
+
 from elasticsearch import Elasticsearch
+
+import config
 
 
 class KibanaError(Exception):
@@ -23,7 +25,7 @@ class Kibana(object):
          :arg since: UNIX timestamp data should be fetched since
          :arg period: period (in seconds) before now() to be used when since is empty (defaults to last 15 minutes)
         """
-        self._es = Elasticsearch(hosts=['lb-s1', 'lb-s2'])
+        self._es = Elasticsearch(hosts=config.ELASTICSEARCH_HOSTS)
         self._logger = logging.getLogger('kibana')
 
         # if no timestamp provided, fallback to now() in UTC
@@ -33,7 +35,7 @@ class Kibana(object):
             since = now - period
         else:
             since += 1
-            self._logger.info("Using provided %d timestamp as since (%d seconds ago)", since, now - since)
+            self._logger.info("Using provided {:d} timestamp as since ({:d} seconds ago)".format(since, now - since))
 
         self._since = since
         self._to = now - 5  # give logs some time to reach Logstash
@@ -44,14 +46,14 @@ class Kibana(object):
             self.format_index(now),
         ])
 
-        self._logger.info("Using %s indices", self._index)
-        self._logger.info("Querying for messages from between %s and %s",
-                          self.format_timestamp(self._since), self.format_timestamp(self._to))
+        self._logger.info("Using {} indices".format(self._index))
+        self._logger.info("Querying for messages from between {} and {}".
+                          format(self.format_timestamp(self._since), self.format_timestamp(self._to)))
 
     @staticmethod
     def format_index(ts):
         # ex. logstash-2014.07.08
-        return "logstash-%s" % datetime.fromtimestamp(ts).strftime('%Y.%m.%d')
+        return "logstash-{}".format(datetime.fromtimestamp(ts).strftime('%Y.%m.%d'))
 
     @staticmethod
     def format_timestamp(ts):
@@ -61,7 +63,7 @@ class Kibana(object):
 
         @see https://docs.python.org/2/library/time.html#time.strftime
         """
-        tz_info = dateutil.tz.tzutc()
+        tz_info = tz.tzutc()
         return datetime.fromtimestamp(timestamp=ts, tz=tz_info).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
     def _get_timestamp_filer(self):
@@ -110,7 +112,7 @@ class Kibana(object):
             "size": limit,
         }
 
-        self._logger.debug("Running %s query (limit set to %d)", json.dumps(body), limit)
+        self._logger.debug("Running {} query (limit set to {:d})".format(json.dumps(body), limit))
 
         data = self._es.search(
             index=self._index,
@@ -122,7 +124,7 @@ class Kibana(object):
 
         rows = [entry['_source'] for entry in data['hits']['hits']]
 
-        self._logger.info("%d rows returned in %d ms", len(rows), data['took'])
+        self._logger.info("{:d} rows returned in {:d} ms".format(len(rows), data['took']))
         return rows
 
     def get_to_timestamp(self):
