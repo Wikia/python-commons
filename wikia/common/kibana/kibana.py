@@ -19,6 +19,12 @@ class KibanaError(Exception):
 
 
 class Kibana(object):
+    # give 5 seconds for all log messages to reach logstash and be stored in elasticsearch
+    SHORT_DELAY = 5
+
+    # seconds in 24h used to get the es index for yesterday
+    DAY = 86400
+
     """ Interface for querying Kibana's storage """
     def __init__(self, since=None, period=900):
         """
@@ -38,11 +44,12 @@ class Kibana(object):
             self._logger.info("Using provided {:d} timestamp as since ({:d} seconds ago)".format(since, now - since))
 
         self._since = since
-        self._to = now - 5  # give logs some time to reach Logstash
+        self._to = now - self.SHORT_DELAY  # give logs some time to reach Logstash
 
         # Elasticsearch index to query
+        # from today and yesterday
         self._index = ','.join([
-            self.format_index(now-86400),
+            self.format_index(now-self.DAY),
             self.format_index(now),
         ])
 
