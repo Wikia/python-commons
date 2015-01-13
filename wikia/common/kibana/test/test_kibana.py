@@ -59,17 +59,3 @@ class KibanaTestClass(unittest.TestCase):
         assert res['range']['@timestamp'] is not None
         assert res['range']['@timestamp']['from'] == '1970-01-02T10:17:37.000Z'
         assert res['range']['@timestamp']['to'] is not None
-
-    @staticmethod
-    def test_get_search_body():
-        instance = Kibana(123456, 60)
-
-        match = 'foo-match'
-        facet_field = 'facets'
-        aggregations = 'aggregations'
-
-        body = instance._get_search_body(match, facet_field, aggregations)
-
-        assert body['size'] == 0
-        assert body['query']['match'] == match
-        assert body['aggregations']['field']['aggregations'] is not None

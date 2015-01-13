@@ -19,7 +19,15 @@ period: period (in seconds) before now() to be used when since is empty (default
 Returns data matching the given query.
 
 match: query to be run against Kibana log messages (ex. {"@message": "Foo Bar DB queries"}).
-limit: the number of results (defaults to 0, no limit).
+limit: the number of results (defaults to 10).
+
+::
+	source.query_by_string(query='@message:"^PHP Fatal"', limit=2000)
+
+Returns data matching the given query string.
+
+query: query string to be run against Kibana log messages (ex. @message:"^PHP Fatal").
+limit: the number of results (defaults to 10).
 
 ::
 	source.get_to_timestamp()
