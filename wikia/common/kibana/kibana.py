@@ -83,43 +83,18 @@ class Kibana(object):
             }
         }
 
-    def _get_search_body(self, match, facet_field, aggregations):
-        return {
-            "query": {
-                "match": match
-            },
-            "size": 0,
-            "aggregations": {
-                "field": {
-                    "filter": self._get_timestamp_filer(),
-                    "aggregations": {
-                        "field": {
-                            "terms": {
-                                "field": facet_field,
-                                "size": 1024,
-                            },
-                            "aggregations": aggregations
-                        }
-                    }
-                }
-            }
-        }
-
-    def get_rows(self, match, limit=0):
+    def _search(self, body, limit=0):
         """
-        Returns raw rows that matches given query
+        Perform the search and return raw rows
 
-        :arg match: query to be run against Kibana log messages (ex. {"@message": "Foo Bar DB queries"})
+        :arg body: query JSON body
+        :arg limit: how many rows to return
+        :return: raw rows
         """
-        body = {
-            "query": {
-                "match": match,
-            },
-            "filter": self._get_timestamp_filer(),
-            "size": limit,
-        }
+        body.setdefault("filter", self._get_timestamp_filer())
+        body.setdefault("size", limit)
 
-        self._logger.debug("Running {} query (limit set to {:d})".format(json.dumps(body), limit))
+        self._logger.debug("Running {} query (limit set to {:d})".format(json.dumps(body), body.get('size', 0)))
 
         data = self._es.search(
             index=self._index,
@@ -133,6 +108,38 @@ class Kibana(object):
 
         self._logger.info("{:d} rows returned in {:d} ms".format(len(rows), data['took']))
         return rows
+
+    def get_rows(self, match, limit=10):
+        """
+        Returns raw rows that matches given query
+
+        :arg match: query to be run against Kibana log messages (ex. {"@message": "Foo Bar DB queries"})
+        :arg limit: the number of results (defaults to 10)
+        """
+        body = {
+            "query": {
+                "match": match,
+            }
+        }
+
+        return self._search(body, limit)
+
+    def query_by_string(self, query, limit=10):
+        """
+        Returns raw rows that matches the given query string
+
+        :arg query: query string to be run against Kibana log messages (ex. @message:"^PHP Fatal").
+        :arg limit: the number of results (defaults to 10)
+        """
+        body = {
+            "query": {
+                "query_string": {
+                    "query": query,
+                }
+            }
+        }
+
+        return self._search(body, limit)
 
     def get_to_timestamp(self):
         """ Return the upper time boundary to returned data """
