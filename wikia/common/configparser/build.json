@@ -1,7 +1,7 @@
 {
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Wrapper around the configparser backport from Python 3.2+",
     "install_requires": [
-        "configparser==3.3.0r2"
+        "configparser==3.5.0b2"
     ]
 }
