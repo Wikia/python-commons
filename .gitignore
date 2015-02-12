@@ -6,3 +6,7 @@ dist/
 venv/
 *.iml
 .idea
+
+coverage.xml
+env/
+htmlcov/

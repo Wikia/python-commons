@@ -60,7 +60,8 @@ class Kibana(object):
     @staticmethod
     def format_index(ts):
         # ex. logstash-2014.07.08
-        return "logstash-{}".format(datetime.fromtimestamp(ts).strftime('%Y.%m.%d'))
+        tz_info = tz.tzutc()
+        return "logstash-%s" % datetime.fromtimestamp(ts, tz=tz_info).strftime('%Y.%m.%d')
 
     @staticmethod
     def format_timestamp(ts):
