@@ -27,6 +27,15 @@ Don't run the ``setup.py`` directly. Use the ``build.py`` convenience script::
 
         <package>   The name of a package directory in wikia/common/
 
+Development
+-----------
+
+python-commons comes with a ``Makefile`` that provides shortcuts for frequently performed commands:
+
+* ``make test`` runs unit tests for all packages
+* ``make coverage`` generates test coverage report for all packages
+* ``make lint`` runs pep8 and pylint tools
+
 Troubleshooting
 ---------------
 
