@@ -3,7 +3,6 @@
 import logging
 import random
 
-import phpserialize
 import sqlalchemy
 
 from config import Config
@@ -56,16 +55,11 @@ class LoadBalancer(object):
         """
         logger.debug("__get_section_from_wiki_factory(): looking for {}".format(dbname))
         connection = self.get_connection('wikicities')
-        sql = sqlalchemy.text("""
-            SELECT cv_value
-            FROM city_variables
-            WHERE cv_variable_id = (SELECT cv_id FROM city_variables_pool WHERE cv_name='wgDBcluster' )
-            AND cv_city_id = ( SELECT city_id FROM city_list WHERE city_dbname = :dbname order by city_id limit 1 )
-            """)
+        sql = sqlalchemy.text("""SELECT city_cluster FROM city_list WHERE city_dbname = :dbname""")
         result = connection.execute(sql, dbname=dbname)
         section = 'central'
         for row in result:
-            section = phpserialize.unserialize(row['cv_value'])
+            section = row['city_cluster']
             logger.debug("__get_section_from_wiki_factory(): found entry with cluster {}".format(section))
         connection.close()
         logger.debug("__get_section_from_wiki_factory(): result = {}".format(section))
