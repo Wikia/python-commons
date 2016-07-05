@@ -1,0 +1,8 @@
+{
+    "version": "1.0.0",
+    "description": "Mediawiki database connector",
+    "install_requires": [
+        "MySQL-python==1.2.5",
+        "PyYAML==3.11"
+    ]
+}
