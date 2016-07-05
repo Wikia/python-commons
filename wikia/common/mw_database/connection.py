@@ -17,6 +17,9 @@ class Connection(object):
     def escape_string(self, s):
         return self.raw_connection.escape_string(s)
 
+    def cursor(self):
+        return self.raw_connection.cursor()
+
     def _query(self, query, *args, **kwargs):
         log_text = 'SQL Query: {}'.format(query)
         if 'args' in kwargs and len(kwargs['args']) > 0:
@@ -34,24 +37,24 @@ class Connection(object):
         if 'cursor' in kwargs:
             return do_exec_query(kwargs.pop('cursor'))
         else:
-            with closing(self.raw_connection.cursor()) as cursor:
+            with closing(self.cursor()) as cursor:
                 return do_exec_query(cursor)
 
     def exec_sql_script_at_once(self, sql_script):
-        with closing(self.raw_connection.cursor()) as cursor:
+        with closing(self.cursor()) as cursor:
             with open(sql_script, 'r') as fp:
                 cursor.execute(fp.read())
-            self.raw_connection.commit()
+            self.commit()
 
     def exec_sql_script(self, sql_script, ignore_duplicates=None):
-        with closing(self.raw_connection.cursor()) as cursor:
+        with closing(self.cursor()) as cursor:
             statement = ''
             for line in open(sql_script):
                 stripped = line.strip()
                 if stripped == '' or stripped[:2] == '--':  # ignore sql comment lines
                     continue
                 statement += line
-                if stripped[-1:] == ';':  # keep appending lines that don't end in ';'
+                if stripped[-1] == ';':  # keep appending lines that don't end with ';'
                     logger.debug('SQL Script: {}'.format(sql_script))
                     logger.debug('SQL Statement: {}'.format(statement))
                     try:
@@ -68,7 +71,7 @@ class Connection(object):
                 logger.debug('SQL Script: {}'.format(sql_script))
                 logger.debug('SQL Statement: {}'.format(statement))
                 cursor.execute(statement)
-            self.raw_connection.commit()
+            self.commit()
 
     def select_as_dicts(self, query, *args, **kwargs):
         return self.query(query, *args, **kwargs).to_dicts
