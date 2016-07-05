@@ -1,7 +1,5 @@
 import collections
 import random
-
-import MySQLdb
 import yaml
 
 
