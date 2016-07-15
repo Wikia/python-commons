@@ -15,6 +15,7 @@ Creating LoadBalancer instance:
 Connecting to global or wiki database:
 
     muppet_conn = load_balancer.connect('muppet')
+    muppet_conn_master = load_balancer.connect('muppet', master=True)
 
 Connecting to blobs cluster:
 
@@ -60,8 +61,8 @@ Shortcut for getting a single field from single row:
 
 Executing an INSERT query:
 
-    result = muppet_conn.query.insert('log', {'log_text': 'asd', 'log_something': True})
-    result = muppet_conn.query('INSERT INTO log(log_text, log_something) VALUES ('asd', true)')
+    result = muppet_conn_master.query.insert('log', {'log_text': 'asd', 'log_something': True})
+    result = muppet_conn_master.query('INSERT INTO log(log_text, log_something) VALUES ('asd', true)')
 
 Inspecting INSERT query results:
 
@@ -72,13 +73,13 @@ Inspecting INSERT query results:
 
 Executing an UPDATE query:
 
-    result = muppet_conn.query.update('page', {'page_title': 'New title'}, {'page_id': 2790})
-    result = muppet_conn.query('UPDATE page SET page_title = "New title" WHERE page_id = 2790')
+    result = muppet_conn_master.query.update('page', {'page_title': 'New title'}, {'page_id': 2790})
+    result = muppet_conn_master.query('UPDATE page SET page_title = "New title" WHERE page_id = 2790')
 
 Executing a DELETE query:
 
-    result = muppet_conn.query.delete('ipblocks', {'ipb_id': 1479})
-    result = muppet_conn.query('DELETE FROM ipblocks WHERE ipb_id = 1479')
+    result = muppet_conn_master.query.delete('ipblocks', {'ipb_id': 1479})
+    result = muppet_conn_master.query('DELETE FROM ipblocks WHERE ipb_id = 1479')
 
 Executing arbitrary SQL query:
 

@@ -9,6 +9,11 @@ ConnectionDetails = collections.namedtuple('ConnectionDetails', ['hostname', 'us
 
 class DatabaseConfig(object):
     def __init__(self, config_file, connect_fn, service_name=None):
+        """
+        :param config_file: Path to DB.yml (default: use WIKIA_DB_YML environment variable)
+        :param connect_fn: Callback function to make actual connection from connection details
+        :param service_name: Service name (used for using service-specific username and password)
+        """
         if config_file is None:
             config_file = os.environ['WIKIA_DB_YML']
         with open(config_file) as fp:
@@ -24,6 +29,16 @@ class DatabaseConfig(object):
 
     def get_connection_details(self, dbname, master=False, wc_master=False, override_db_name=None, username=None,
                                password=None):
+        """
+        :param dbname: Database name
+        :param master: Connect to cluster master? (default: False)
+        :param wc_master: Connect to wikicities master when looking where the wiki lives? (default: False)
+        :param override_db_name: Database name override (useful when you want to create database when it does not exist)
+        :param username: Username (both username and password must be specified or they are void)
+        :param password: Password
+        :return:
+        :rtype: ConnectionDetails
+        """
         cluster = self.cluster_from_dbname(dbname, master or wc_master)
         hostname = self.host_from_cluster_and_type(cluster, master=master)
         hostname, dbname, username, password = self.expand_credentials(hostname, dbname, cluster, username, password)
