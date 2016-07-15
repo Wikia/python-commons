@@ -37,12 +37,12 @@ class InfluxDBSettings(object):
         """
         settings = {
             'prod': {
-                "host": 'graph-s3',
+                "host": 'app-metrics-etl.service.sjc.consul',
                 "udp_port": 4444,
                 "use_udp": True,
             },
             'dev': {
-                "host": 'graph-s3',
+                "host": 'app-metrics-etl.service.sjc.consul',
                 "udp_port": 5551,
                 "use_udp": True,
             }
