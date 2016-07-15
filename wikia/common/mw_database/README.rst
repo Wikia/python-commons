@@ -83,3 +83,19 @@ Executing a DELETE query:
 Executing arbitrary SQL query:
 
     result = muppet_conn.query('SHOW TABLES')
+
+Using SqlLiteral (for specifying values):
+
+    from wikia.common.mw_database import SqlLiteral, SqlCondition
+
+    wikicities_conn = load_balancer.connect('muppet')
+    result = wikicities_conn.query.select('city_list', '*', {'city_last_timestamp': SqlLiteral('now() - interval 3 day')})
+    -- SELECT * FROM city_list WHERE city_last_timestamp = now() - interval 3 day
+
+Using SqlCondition (for specifying conditions):
+
+    from wikia.common.mw_database import SqlLiteral, SqlCondition
+
+    result = muppet_conn.query.select('page', '*', {'anything': SqlCondition('page_id < %s', args=[100])})
+    result = muppet_conn.query.select('page', '*', {'anything': SqlCondition('page_id < %(page_id)s', args={'page_id':100})})
+    -- SELECT * FROM page WHERE page_id < 100
