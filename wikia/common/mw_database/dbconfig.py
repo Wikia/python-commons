@@ -1,4 +1,5 @@
 import collections
+import os
 import random
 import yaml
 
@@ -8,6 +9,8 @@ ConnectionDetails = collections.namedtuple('ConnectionDetails', ['hostname', 'us
 
 class DatabaseConfig(object):
     def __init__(self, config_file, connect_fn, service_name=None):
+        if config_file is None:
+            config_file = os.environ['WIKIA_DB_YML']
         with open(config_file) as fp:
             ds_conf = yaml.load(fp)
         self.mw_config = ds_conf[0]

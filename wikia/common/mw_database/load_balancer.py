@@ -6,7 +6,7 @@ from .dbconfig import DatabaseConfig
 
 
 class LoadBalancer(object):
-    def __init__(self, db_config_file, service_name=None, override_consul_dc=None):
+    def __init__(self, db_config_file=None, service_name=None, override_consul_dc=None):
         self.db_config_file = db_config_file
         self.db_config = DatabaseConfig(self.db_config_file, self._raw_connect, service_name)
         self.override_consul_dc = override_consul_dc

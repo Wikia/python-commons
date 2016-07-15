@@ -73,9 +73,6 @@ class Connection(object):
                 cursor.execute(statement)
             self.commit()
 
-    def select_as_dicts(self, query, *args, **kwargs):
-        return self.query(query, *args, **kwargs).to_dicts
-
     def last_insert_id(self):
         return self.raw_connection.insert_id()
 
@@ -88,7 +85,18 @@ class SqlBuilderMixin(object):
     def query(self, *args, **kwargs):
         raise NotImplementedError('Inheritors must overrie SqlBuilderMixin.query')
 
+    def select_as_dicts(self, table, what, where):
+        return self.select(table, what, where).to_dicts
+
     def select(self, table, what, where):
+        """
+        Execute SELECT statement
+        :param table:
+        :param what:
+        :param where:
+        :return:
+        :rtype: QueryResult
+        """
         sql_data = {}
         where_clause = self.where(where, sql_data)
         sql = 'SELECT {} FROM {} WHERE {};'.format(what, table, where_clause)
@@ -96,6 +104,15 @@ class SqlBuilderMixin(object):
         return self.query(sql, args=sql_data)
 
     def insert(self, table, data, ignore_errors=False):
+        """
+        Execute INSERT statement
+
+        :param table: Table name
+        :param data: Dictionary with data
+        :param ignore_errors: Option flag to ignore duplicated-class errors durign query execution
+        :return:
+        :rtype: QueryResult
+        """
         columns = []
         values = []
         sql_data = {}
@@ -114,6 +131,15 @@ class SqlBuilderMixin(object):
         return self.query(sql, args=sql_data)
 
     def update(self, table, data, conds):
+        """
+        Execute UPDATE statement
+
+        :param table: Table name
+        :param data: Dictionary with data to be updated
+        :param conds: Conditions
+        :return:
+        :rtype: QueryResult
+        """
         sql_data = {}
         set_clause = []
         where_clause = []
@@ -126,6 +152,14 @@ class SqlBuilderMixin(object):
         return self.query(sql, args=sql_data)
 
     def delete(self, table, where):
+        """
+        Execute DELETE statement
+
+        :param table: Table name
+        :param where: Conditions
+        :return:
+        :rtype: QueryResult
+        """
         sql_data = {}
         sql = 'DELETE FROM {} WHERE {};'.format(table, self.where(where, sql_data))
 
@@ -168,6 +202,14 @@ class ConnectionQueryBuilder(SqlBuilderMixin):
         return self.query(*args, **kwargs)
 
     def query(self, *args, **kwargs):
+        """
+        Execute query
+
+        :param sql_text: SQL query text
+        :param args: SQL query values
+        :return:
+        :rtype: QueryResult
+        """
         return self.connection._query(*args, **kwargs)
 
     def select_field(self, table, what, where):
