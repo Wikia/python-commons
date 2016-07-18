@@ -51,9 +51,12 @@ class Connection(object):
             # log SQL - sampled at 1%
             if random.random() < 0.01:
                 extra = {}
-                extra.update(self.connection_info.__dict__ or {})
+                try:
+                    extra.update(self.connection_info.__dict__)
+                except Exception:
+                    pass
                 extra.pop('password', None)
-                extra['affected'] = affected
+                extra['num_rows'] = affected
                 extra['elapsed'] = time.time() - time_started
 
                 try:
@@ -61,7 +64,7 @@ class Connection(object):
                 except Exception:
                     extra['script'] = 'interactive?'
 
-                self.logger.info('SQL - {}'.format(query), extra=extra)
+                self.logger.info('SQL {}'.format(query), extra=extra)
 
             return QueryResult(query, args, kwargs, affected, cursor.description, all_rows)
 
