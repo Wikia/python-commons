@@ -4,7 +4,7 @@ import random
 import yaml
 
 
-ConnectionDetails = collections.namedtuple('ConnectionDetails', ['hostname', 'username', 'password', 'dbname'])
+ConnectionDetails = collections.namedtuple('ConnectionDetails', ['hostname', 'username', 'password', 'dbname', 'cluster', 'master'])
 
 
 class DatabaseConfig(object):
@@ -46,7 +46,7 @@ class DatabaseConfig(object):
         if override_db_name is not None:
             dbname = override_db_name
 
-        return ConnectionDetails(hostname=hostname, username=username, password=password, dbname=dbname)
+        return ConnectionDetails(hostname=hostname, username=username, password=password, dbname=dbname, cluster=cluster, master=master)
 
     def get_external_connection_details(self, dbname, master=False, wc_master=False, override_db_name=None, username=None,
                                            password=None):
@@ -56,7 +56,7 @@ class DatabaseConfig(object):
         if override_db_name is not None:
             dbname = override_db_name
 
-        return ConnectionDetails(hostname=hostname, username=username, password=password, dbname=dbname)
+        return ConnectionDetails(hostname=hostname, username=username, password=password, dbname=dbname, cluster=dbname, master=master)
 
     def cluster_from_dbname(self, dbname, master):
         if dbname in self.mw_config['sectionsByDB']:

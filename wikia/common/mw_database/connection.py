@@ -1,15 +1,29 @@
 from contextlib import closing
 import logging
+import random
 import MySQLdb
+import time
 import six
+import sys
+
+import wikia.common.logger
+
 
 logger = logging.getLogger(__name__)
 
 
 class Connection(object):
-    def __init__(self, raw_connection):
+    def __init__(self, raw_connection, connection_info=None):
         self.raw_connection = raw_connection
+        self.connection_info = connection_info
         self.query = ConnectionQueryBuilder(self)
+        self.__logger = None
+
+    @property
+    def logger(self):
+        if self.__logger is None:
+            self.__logger = wikia.common.logger.Logger.get(__name__)
+        return self.__logger
 
     def close(self):
         self.raw_connection.close()
@@ -28,9 +42,26 @@ class Connection(object):
             log_text += ' (with args: {})'.format(kwargs['args'])
         logger.debug(log_text)
         def do_exec_query(cursor):
+            time_started = time.time()
+
             returned = cursor.execute(query, *args, **kwargs)
             affected = cursor.rowcount
             all_rows = cursor.fetchall()
+
+            # log SQL - sampled at 1%
+            if random.random() < 0.01:
+                extra = {}
+                extra.update(self.connection_info.__dict__ or {})
+                extra.pop('password', None)
+                extra['affected'] = affected
+                extra['elapsed'] = time.time() - time_started
+
+                try:
+                    extra['script'] = sys.modules['__main__'].__file__
+                except Exception:
+                    extra['script'] = 'interactive?'
+
+                self.logger.info('SQL - {}'.format(query), extra=extra)
 
             return QueryResult(query, args, kwargs, affected, cursor.description, all_rows)
 

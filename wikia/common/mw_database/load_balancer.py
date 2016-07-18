@@ -18,7 +18,7 @@ class LoadBalancer(object):
         else:
             conn_details = self.db_config.get_external_connection_details(*args, **kwargs)
 
-        return Connection(self._raw_connect(conn_details))
+        return Connection(self._raw_connect(conn_details), conn_details)
 
     def _raw_connect(self, conn_details):
         if self.override_consul_dc is not None:
