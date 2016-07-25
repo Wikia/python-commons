@@ -52,11 +52,12 @@ class Logger(logging.getLoggerClass()):
         return logger
 
     @staticmethod
-    def get(name='WikiaLogger', app_name='python', level=None):
+    def get(name='WikiaLogger', app_name=None, level=None):
         current = logging.getLoggerClass()
         logging.setLoggerClass(Logger)
         logger = logging.getLogger(name)
-        LogRecord.app_name = app_name
+        if app_name is not None:
+            LogRecord.app_name = app_name
 
         if level is not None:
             logger.setLevel(level)
