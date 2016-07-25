@@ -7,6 +7,7 @@ Basic Usage
 -----------
 
 Creating LoadBalancer instance:
+
 ```
 from wikia.common.mw_database import LoadBalancer
 
@@ -14,16 +15,20 @@ load_balancer = LoadBalancer(service_name="my-awesome-service")
 ```
 
 Connecting to global or wiki database:
+
 ```
 muppet_conn = load_balancer.connect('muppet')
 muppet_conn_master = load_balancer.connect('muppet', master=True)
 ```
+
 Connecting to blobs cluster:
+
 ```
 blobs_conn = load_balancer.connect_external('archive1')
 ```
 
 Executing a SELECT query. All of those below have the same effect:
+
 ```
 result = muppet_conn.query.select('page', '*', {'page_id': 2000})
 result = muppet_conn.query('SELECT * FROM page WHERE page_id = 2000')
@@ -32,6 +37,7 @@ result = muppet_conn.query('SELECT * FROM page WHERE page_id = %s', args=[2000])
 ```
 
 Inspecting SELECT query results:
+
 ```
 print result.affected
 -- 1L
@@ -56,40 +62,55 @@ for row in result:
 ```
 
 Shortcut for executing SELECT query and getting rows as dictionaries:
+
 ```
 print muppet_conn.query.select_as_dicts('page', '*', {'page_id': 2000})
 ```
+
 Shortcut for getting a single field from single row:
+
 ```
 print muppet_conn.query.select_field('page', 'page_title', {'page_id': 2000})
 ```
+
 Executing an INSERT query:
+
 ```
 result = muppet_conn_master.query.insert('log', {'log_text': 'asd', 'log_something': True})
 result = muppet_conn_master.query('INSERT INTO log(log_text, log_something) VALUES ('asd', true)')
 ```
+
 Inspecting INSERT query results:
+
 ```
 print result.affected
 -- 1L
 print muppet_conn.last_insert_id()
 -- 1724L
 ```
+
 Executing an UPDATE query:
+
 ```
 result = muppet_conn_master.query.update('page', {'page_title': 'New title'}, {'page_id': 2790})
 result = muppet_conn_master.query('UPDATE page SET page_title = "New title" WHERE page_id = 2790')
 ```
+
 Executing a DELETE query:
+
 ```
 result = muppet_conn_master.query.delete('ipblocks', {'ipb_id': 1479})
 result = muppet_conn_master.query('DELETE FROM ipblocks WHERE ipb_id = 1479')
 ```
+
 Executing arbitrary SQL query:
+
 ```
 result = muppet_conn.query('SHOW TABLES')
 ```
+
 Using SqlLiteral (for specifying values):
+
 ```
 from wikia.common.mw_database import SqlLiteral, SqlCondition
 
@@ -97,7 +118,9 @@ wikicities_conn = load_balancer.connect('muppet')
 result = wikicities_conn.query.select('city_list', '*', {'city_last_timestamp': SqlLiteral('now() - interval 3 day')})
 -- SELECT * FROM city_list WHERE city_last_timestamp = now() - interval 3 day
 ```
+
 Using SqlCondition (for specifying conditions):
+
 ```
 from wikia.common.mw_database import SqlLiteral, SqlCondition
 
