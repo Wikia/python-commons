@@ -39,7 +39,7 @@ class DatabaseConfig(object):
         :return:
         :rtype: ConnectionDetails
         """
-        cluster = self.cluster_from_dbname(dbname, master or wc_master)
+        cluster = self.cluster_from_dbname(dbname, wc_master)
         hostname = self.host_from_cluster_and_type(cluster, master=master)
         hostname, dbname, username, password = self.expand_credentials(hostname, dbname, cluster, username, password)
 
@@ -50,6 +50,16 @@ class DatabaseConfig(object):
 
     def get_external_connection_details(self, dbname, master=False, wc_master=False, override_db_name=None, username=None,
                                            password=None):
+        """
+        :param dbname: External cluster name (almost the same as database name)
+        :param master: Connect to cluster master? (default: False)
+        :param wc_master: Connect to wikicities master when looking where the wiki lives? (default: False)
+        :param override_db_name: Database name override (useful when you want to create database when it does not exist)
+        :param username: Username (both username and password must be specified or they are void)
+        :param password: Password
+        :return:
+        :rtype: ConnectionDetails
+        """
         hostname = self.host_from_external_cluster_and_type(dbname, master=master)
         hostname, dbname, username, password = self.expand_credentials(hostname, dbname, dbname, username, password)
 

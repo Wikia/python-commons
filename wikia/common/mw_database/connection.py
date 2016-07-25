@@ -22,7 +22,7 @@ class Connection(object):
     @property
     def logger(self):
         if self.__logger is None:
-            self.__logger = wikia.common.logger.Logger.get(__name__)
+            self.__logger = wikia.common.logger.Logger.get(__name__, level=logging.INFO)
         return self.__logger
 
     def close(self):
