@@ -46,7 +46,7 @@ class Connection(SqlBuilderMixin):
 
             returned = cursor.execute(query, *args, **kwargs)
             affected = cursor.rowcount
-            all_rows = cursor.fetchall()
+            rows = cursor.fetchall()
 
             # log SQL - sampled at 1%
             if random.random() < 0.01:
@@ -66,13 +66,16 @@ class Connection(SqlBuilderMixin):
 
                 self.logger.info('SQL {}'.format(query), extra=extra)
 
-            return QueryResult(query, args, kwargs, affected, cursor.description, all_rows)
+            return QueryResult(query, args, kwargs, affected, cursor.description, rows)
 
         if 'cursor' in kwargs:
             return do_exec_query(kwargs.pop('cursor'))
         else:
             with closing(self.cursor()) as cursor:
                 return do_exec_query(cursor)
+
+    def query_as_dicts(self, *args, **kwargs):
+        return self.query(*args, **kwargs).rows_as_dicts
 
     def exec_sql_script_at_once(self, sql_script):
         with closing(self.cursor()) as cursor:
@@ -115,25 +118,25 @@ class Connection(SqlBuilderMixin):
 
 
 class QueryResult(object):
-    def __init__(self, query, query_args, query_kwargs, affected, description, all_rows):
+    def __init__(self, query, query_args, query_kwargs, affected, description, rows):
         self.query = query
         self.query_args = query_args
         self.query_kwargs = query_kwargs
         self.affected = affected
         self.description = description
-        self.all_rows = all_rows
-        self.num_rows = len(all_rows)
+        self.rows = rows
+        self.num_rows = len(rows)
 
     @property
-    def to_dicts(self):
+    def rows_as_dicts(self):
         column_names = [column[0] for column in self.description]
         column_range = range(len(column_names))
         res = []
-        for row in self.all_rows:
+        for row in self.rows:
             res.append({column_names[i]: row[i] if not isinstance(row[i], (str, six.text_type)) else str(row[i])
                         for i in column_range
                         })
         return res
 
     def __iter__(self):
-        return iter(self.all_rows)
+        return iter(self.rows)
