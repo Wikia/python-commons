@@ -1,5 +1,5 @@
 {
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Mediawiki database connector",
     "install_requires": [
         "MySQL-python==1.2.5",

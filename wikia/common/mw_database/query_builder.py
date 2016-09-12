@@ -11,7 +11,7 @@ class SqlBuilderMixin(object):
         raise NotImplementedError('Inheritors must overrie SqlBuilderMixin.query')
 
     def select_as_dicts(self, table, what, where):
-        return self.select(table, what, where).to_dicts
+        return self.select(table, what, where).rows_as_dicts
 
     def select(self, table, what, where):
         """
