@@ -6,6 +6,8 @@ from .dbconfig import DatabaseConfig
 
 
 class LoadBalancer(object):
+    CONNECTION_CLASS = Connection
+
     def __init__(self, db_config_file=None, service_name=None, override_consul_dc=None):
         self.db_config_file = db_config_file
         self.db_config = DatabaseConfig(self.db_config_file, self._raw_connect, service_name)
@@ -18,7 +20,10 @@ class LoadBalancer(object):
         else:
             conn_details = self.db_config.get_external_connection_details(*args, **kwargs)
 
-        return Connection(self._raw_connect(conn_details), conn_details)
+        return self._create_connection(self._raw_connect(conn_details), conn_details)
+
+    def _create_connection(self, *args, **kwargs):
+        return self.CONNECTION_CLASS(*args, **kwargs)
 
     def _raw_connect(self, conn_details):
         if self.override_consul_dc is not None:

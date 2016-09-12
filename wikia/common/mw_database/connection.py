@@ -185,17 +185,17 @@ class SqlBuilderMixin(object):
 
         return self.query(sql, args=sql_data)
 
-    def delete(self, table, where):
+    def delete(self, table, conds):
         """
         Execute DELETE statement
 
         :param table: Table name
-        :param where: Conditions
+        :param conds: Conditions
         :return:
         :rtype: QueryResult
         """
         sql_data = {}
-        sql = 'DELETE FROM {} WHERE {};'.format(table, self.where(where, sql_data))
+        sql = 'DELETE FROM {} WHERE {};'.format(table, self.where(conds, sql_data))
 
         return self.query(sql, args=sql_data)
 
@@ -247,7 +247,10 @@ class ConnectionQueryBuilder(SqlBuilderMixin):
         return self.connection._query(*args, **kwargs)
 
     def select_field(self, table, what, where):
-        return self.select(table, what, where).all_rows[0][0]
+        res = self.select(table, what, where)
+        if res.num_rows != 1:
+            raise ValueError("Query in select_field() returned {} rows instead of 1".format(res.num_rows))
+        return res.all_rows[0][0]
 
 
 class QueryResult(object):
@@ -258,6 +261,7 @@ class QueryResult(object):
         self.affected = affected
         self.description = description
         self.all_rows = all_rows
+        self.num_rows = len(all_rows)
 
     @property
     def to_dicts(self):
