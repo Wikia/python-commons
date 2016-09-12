@@ -126,7 +126,7 @@ class DatabaseConfig(object):
                 dbname = host_override.get("dbname", dbname)
 
             service_override = self.mw_config["templateOverridesByService"].get(self.service_name, False)
-            if host_override is not False:
+            if service_override is not False:
                 username = service_override.get("user", username)
                 password = service_override.get("password", password)
 
