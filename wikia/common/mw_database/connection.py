@@ -185,17 +185,17 @@ class SqlBuilderMixin(object):
 
         return self.query(sql, args=sql_data)
 
-    def delete(self, table, where):
+    def delete(self, table, conds):
         """
         Execute DELETE statement
 
         :param table: Table name
-        :param where: Conditions
+        :param conds: Conditions
         :return:
         :rtype: QueryResult
         """
         sql_data = {}
-        sql = 'DELETE FROM {} WHERE {};'.format(table, self.where(where, sql_data))
+        sql = 'DELETE FROM {} WHERE {};'.format(table, self.where(conds, sql_data))
 
         return self.query(sql, args=sql_data)
 
