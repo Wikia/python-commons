@@ -8,10 +8,11 @@ ConnectionDetails = collections.namedtuple('ConnectionDetails', ['hostname', 'us
 
 
 class DatabaseConfig(object):
-    def __init__(self, config_file, connect_fn, service_name=None):
+    def __init__(self, config_file, connect_fn, conn_details_postprocess_fn, service_name=None):
         """
         :param config_file: Path to DB.yml (default: use WIKIA_DB_YML environment variable)
         :param connect_fn: Callback function to make actual connection from connection details
+        :param conn_details_postprocess_fn: Callback function to postprocess connection details
         :param service_name: Service name (used for using service-specific username and password)
         """
         if config_file is None:
@@ -25,6 +26,7 @@ class DatabaseConfig(object):
         self.cluster_config = ds_conf[1]
         self.external_cluster_config = ds_conf[2]
         self.connect_fn = connect_fn
+        self.conn_details_postprocess_fn = conn_details_postprocess_fn
         self.service_name = service_name
 
     def get_connection_details(self, dbname, master=False, wc_master=False, override_db_name=None, username=None,
@@ -46,7 +48,10 @@ class DatabaseConfig(object):
         if override_db_name is not None:
             dbname = override_db_name
 
-        return ConnectionDetails(hostname=hostname, username=username, password=password, dbname=dbname, cluster=cluster, master=master)
+        conn_details = ConnectionDetails(hostname=hostname, username=username, password=password, dbname=dbname, cluster=cluster, master=master)
+        conn_details = self.postprocess_connection_details(conn_details)
+
+        return conn_details
 
     def get_external_connection_details(self, dbname, master=False, wc_master=False, override_db_name=None, username=None,
                                            password=None):
@@ -66,7 +71,13 @@ class DatabaseConfig(object):
         if override_db_name is not None:
             dbname = override_db_name
 
-        return ConnectionDetails(hostname=hostname, username=username, password=password, dbname=dbname, cluster=dbname, master=master)
+        conn_details = ConnectionDetails(hostname=hostname, username=username, password=password, dbname=dbname, cluster=cluster, master=master)
+        conn_details = self.postprocess_connection_details(conn_details)
+
+        return conn_details
+
+    def postprocess_connection_details(self, conn_details):
+        return self.conn_details_postprocess_fn(conn_details)
 
     def cluster_from_dbname(self, dbname, master):
         if dbname in self.mw_config['sectionsByDB']:
