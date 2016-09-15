@@ -10,29 +10,35 @@ class LoadBalancer(object):
 
     def __init__(self, db_config_file=None, service_name=None, override_consul_dc=None):
         self.db_config_file = db_config_file
-        self.db_config = DatabaseConfig(self.db_config_file, self._raw_connect, service_name)
+        self.db_config = DatabaseConfig(self.db_config_file,
+                                        self._raw_connect, self._replace_consul_dc, service_name)
         self.override_consul_dc = override_consul_dc
 
-    def connect(self, *args, **kwargs):
+    def get_connection_details(self, *args, **kwargs):
         external = kwargs.pop('external', False)
         if not external:
             conn_details = self.db_config.get_connection_details(*args, **kwargs)
         else:
             conn_details = self.db_config.get_external_connection_details(*args, **kwargs)
 
+        return conn_details
+
+    def connect(self, *args, **kwargs):
+        conn_details = self.get_connection_details(*args, **kwargs)
         return self._create_connection(self._raw_connect(conn_details), conn_details)
+
+    def _replace_consul_dc(self, conn_details):
+        if self.override_consul_dc is not None:
+            conn_details = conn_details._replace(
+                hostname=conn_details.hostname.replace(
+                    '.service.consul',
+                    '.service.{}.consul'.format(self.override_consul_dc)))
+        return conn_details
 
     def _create_connection(self, *args, **kwargs):
         return self.CONNECTION_CLASS(*args, **kwargs)
 
     def _raw_connect(self, conn_details):
-        if self.override_consul_dc is not None:
-            conn_details_dict = dict(conn_details.__dict__)
-            conn_details_dict['hostname'] = conn_details.hostname.replace(
-                '.service.consul',
-                '.service.{}.consul'.format(self.override_consul_dc))
-            conn_details = ConnectionDetails(**conn_details_dict)
-
         raw_connection = MySQLdb.connect(
             conn_details.hostname,
             conn_details.username,
