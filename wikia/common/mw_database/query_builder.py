@@ -42,7 +42,7 @@ class SqlBuilderMixin(object):
         values = []
         sql_data = {}
         for column, value in data.items():
-            columns.append(column)
+            columns.append('`{}`'.format(column))
             sql_value, is_value = self.add_value(value, sql_data, column)
             if not is_value:
                 raise ValueError('insert accepts only value literals')

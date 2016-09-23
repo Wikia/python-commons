@@ -6,6 +6,7 @@ dist/
 venv/
 *.iml
 .idea
+*.swp
 
 coverage.xml
 env/
