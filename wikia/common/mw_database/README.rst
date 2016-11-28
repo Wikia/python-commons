@@ -78,7 +78,7 @@ Shortcut for executing SELECT query and getting rows as dictionaries:
 
 Shortcut for getting a single field from single row:
 
-    print muppet_conn.query.select_field('page', 'page_title', {'page_id': 2000})
+    print muppet_conn.select_field('page', 'page_title', {'page_id': 2000})
 
 Executing an INSERT query:
 
