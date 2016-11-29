@@ -58,7 +58,7 @@ In your ``~/.pypirc`` add the following::
    ...
    
    [wikia]
-   repository=https://artifactory.wikia-inc.com/artifactory/pypi/pypi
+   repository = https://artifactory.wikia-inc.com/artifactory/api/pypi/pypi/
    username = <your username>
    password = <generated API key>
 
