@@ -122,4 +122,4 @@ class SqlBuilderMixin(object):
         res = self.select(table, what, where)
         if res.num_rows != 1:
             raise ValueError("Query in select_field() returned {} rows instead of 1".format(res.num_rows))
-        return res.all_rows[0][0]
+        return res.rows[0][0]
