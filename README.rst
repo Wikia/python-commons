@@ -42,3 +42,24 @@ Troubleshooting
 If developing on a local machine make sure you have the latest version of pip:
 
     pip install -U pip
+    
+Uploading packages
+------------------
+
+We use Artifactory as package repository. Please log in there generate credentials - https://wikia-inc.atlassian.net/wiki/display/GEN/Artifactory+-+Internal+package+repositories
+
+In your ``~/.pypirc`` add the following::
+
+   [distutils]
+   index-servers =
+       pypi
+       wikia
+   
+   ...
+   
+   [wikia]
+   repository=https://artifactory.wikia-inc.com/artifactory/pypi/pypi
+   username = <your username>
+   password = <generated API key>
+
+When ready to upload the updated package simply run ``python build.py upload`` from root directory of this repository. Your package should be visible on https://artifactory.wikia-inc.com/artifactory/pypi/
