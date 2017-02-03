@@ -11,8 +11,6 @@ from dateutil import tz
 
 from elasticsearch import Elasticsearch
 
-import config
-
 
 class KibanaError(Exception):
     pass
@@ -25,13 +23,20 @@ class Kibana(object):
     # seconds in 24h used to get the es index for yesterday
     DAY = 86400
 
+    ELASTICSEARCH_HOST = 'lb.service.sjc.consul'
+
     """ Interface for querying Kibana's storage """
-    def __init__(self, since=None, period=900):
+    def __init__(self, since=None, period=900, es_host=None):
         """
-         :arg since: UNIX timestamp data should be fetched since
-         :arg period: period (in seconds) before now() to be used when since is empty (defaults to last 15 minutes)
+        :type since int
+        :type period int
+        :type es_host str
+
+        :arg since: UNIX timestamp data should be fetched since
+        :arg period: period (in seconds) before now() to be used when since is empty (defaults to last 15 minutes)
+        :arg es_host: customize Elasticsearch host(s) that should be used for querying
         """
-        self._es = Elasticsearch(hosts=config.ELASTICSEARCH_HOSTS)
+        self._es = Elasticsearch(hosts=es_host if es_host else self.ELASTICSEARCH_HOST)
         self._logger = logging.getLogger('kibana')
 
         # if no timestamp provided, fallback to now() in UTC
