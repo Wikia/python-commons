@@ -26,17 +26,20 @@ class Kibana(object):
     ELASTICSEARCH_HOST = 'lb.service.sjc.consul'
 
     """ Interface for querying Kibana's storage """
-    def __init__(self, since=None, period=900, es_host=None):
+    def __init__(self, since=None, period=900, es_host=None, read_timeout=10):
         """
         :type since int
         :type period int
         :type es_host str
+        :type read_timeout int
 
         :arg since: UNIX timestamp data should be fetched since
         :arg period: period (in seconds) before now() to be used when since is empty (defaults to last 15 minutes)
         :arg es_host: customize Elasticsearch host(s) that should be used for querying
+        :arg read_timeout: customize Elasticsearch read timeout (defaults to 10 s)
         """
-        self._es = Elasticsearch(hosts=es_host if es_host else self.ELASTICSEARCH_HOST)
+        self._es = Elasticsearch(hosts=es_host if es_host else self.ELASTICSEARCH_HOST, timeout=read_timeout)
+
         self._logger = logging.getLogger('kibana')
 
         # if no timestamp provided, fallback to now() in UTC
