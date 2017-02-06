@@ -41,8 +41,17 @@ Troubleshooting
 
 If developing on a local machine make sure you have the latest version of pip:
 
-    pip install -U pip
+    pip install -U pip==7.0.3
     
+Using Artifactory in pip
+------------------------
+    
+In your ``~/.pip/pip.conf`` define the following::
+
+    [global]
+    index-url = https://pypi.python.org/pypi
+    extra-index-url = https://artifactory.wikia-inc.com/artifactory/api/pypi/pypi/simple/
+
 Uploading packages
 ------------------
 
