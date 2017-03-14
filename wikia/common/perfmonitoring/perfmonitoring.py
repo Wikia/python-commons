@@ -28,7 +28,7 @@ class InfluxDBSettings(object):
         """
         Is the current environment a development one?
         """
-        return self._environ.get('WIKIA_ENVIRONMENT', 'dev') == 'dev'
+        return (self._environ.get('WIKIA_ENVIRONMENT') or 'dev') == 'dev'
 
     @property
     def is_staging(self):
