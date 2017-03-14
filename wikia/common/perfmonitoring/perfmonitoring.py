@@ -31,18 +31,28 @@ class InfluxDBSettings(object):
         return self._environ.get('WIKIA_ENVIRONMENT', 'dev') == 'dev'
 
     @property
+    def is_staging(self):
+        """Returns True on staging env."""
+        return self._environ.get('WIKIA_ENVIRONMENT') == 'staging'
+
+    @property
     def settings(self):
         """
         Return InfluxDB settings for a current environment
         """
         settings = {
             'prod': {
-                "host": 'app-metrics-etl.service.sjc.consul',
+                "host": 'prod.app-metrics-etl.service.sjc.consul',
                 "udp_port": 4444,
                 "use_udp": True,
             },
+            'staging': {
+                "host": 'staging.app-metrics-etl.service.sjc.consul',
+                "udp_port": 5552,
+                "use_udp": True,
+            },
             'dev': {
-                "host": 'app-metrics-etl.service.sjc.consul',
+                "host": 'prod,app-metrics-etl.service.sjc.consul',
                 "udp_port": 5551,
                 "use_udp": True,
             }
@@ -50,6 +60,8 @@ class InfluxDBSettings(object):
 
         if self.is_dev:
             return settings['dev']
+        elif self.is_staging:
+            return settings['staging']
         else:
             return settings['prod']
 
