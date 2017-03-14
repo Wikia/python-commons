@@ -101,7 +101,7 @@ class InfluxDBSettingsTest(unittest.TestCase):
         ]
 
         for case in cases:
-            self.check_is_dev(**case)
+            self.check_is_staging(**case)
 
     @staticmethod
     def check_is_staging(environ, expected_is_staging):
