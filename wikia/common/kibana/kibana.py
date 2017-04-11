@@ -23,7 +23,7 @@ class Kibana(object):
     # seconds in 24h used to get the es index for yesterday
     DAY = 86400
 
-    ELASTICSEARCH_HOST = 'lb.service.sjc.consul'
+    ELASTICSEARCH_HOST = 'query-prod.es.service.sjc.consul'
 
     """ Interface for querying Kibana's storage """
     def __init__(self, since=None, period=900, es_host=None, read_timeout=10):
