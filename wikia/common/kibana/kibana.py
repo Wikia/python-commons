@@ -81,7 +81,7 @@ class Kibana(object):
         @see https://docs.python.org/2/library/time.html#time.strftime
         """
         tz_info = tz.tzutc()
-        return datetime.fromtimestamp(timestamp=ts, tz=tz_info).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+        return datetime.fromtimestamp(ts, tz=tz_info).strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
     def _get_timestamp_filer(self):
         return {
@@ -97,9 +97,9 @@ class Kibana(object):
         """
         Perform the search and return raw rows
 
-        :arg body: query JSON body
-        :arg limit: how many rows to return
-        :return: raw rows
+        :type query object
+        :type limit int
+        :rtype: list
         """
         body = {
             "query": {
