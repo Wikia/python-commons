@@ -8,8 +8,10 @@ import time
 
 from datetime import datetime
 from dateutil import tz
+from itertools import islice
 
 from elasticsearch import Elasticsearch
+from elasticsearch.helpers import scan
 
 
 class KibanaError(Exception):
@@ -93,7 +95,7 @@ class Kibana(object):
             }
         }
 
-    def _search(self, query, limit=0):
+    def _search(self, query, limit=50000):
         """
         Perform the search and return raw rows
 
@@ -108,8 +110,7 @@ class Kibana(object):
                         query
                     ]
                 }
-            },
-            "size": limit
+            }
         }
 
         # add @timestamp range
@@ -119,17 +120,24 @@ class Kibana(object):
 
         self._logger.debug("Running {} query (limit set to {:d})".format(json.dumps(body), body.get('size', 0)))
 
-        data = self._es.search(
+        # use Scroll API to be able to fetch more than 10k results and prevent "search_phase_execution_exception":
+        # "Result window is too large, from + size must be less than or equal to: [10000] but was [500000].
+        # See the scroll api for a more efficient way to request large data sets."
+        #
+        # @see http://elasticsearch-py.readthedocs.io/en/master/helpers.html#scan
+        rows = scan(
+            client=self._es,
+            clear_scroll=False,  # True causes "403 Forbidden: You don't have access to this resource"
             index=self._index,
-            body=body,
+            query=body,
+            sort=["_doc"],  # return the next batch of results from every shard that still has results to return.
+            size=1000,  # batch size
         )
 
-        if data['timed_out'] is True:
-            raise KibanaError("The query timed out!")
+        # get only requested amount of entries and cast them to a list
+        rows = list(islice(rows, 0, limit))
 
-        rows = [entry['_source'] for entry in data['hits']['hits']]
-
-        self._logger.info("{:d} rows returned in {:d} ms".format(len(rows), data['took']))
+        self._logger.info("{:d} rows returned".format(len(rows)))
         return rows
 
     def get_rows(self, match, limit=10):
