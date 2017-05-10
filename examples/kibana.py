@@ -17,3 +17,9 @@ print json.dumps(rows, indent=True)
 
 rows = source.query_by_string(query='@message:"^PHP Fatal Error"', limit=2000)
 print json.dumps(rows, indent=True)
+
+# customize index to query Apache access log
+rows = Kibana(period=86400, index_prefix='logstash-apache-access-log').query_by_string(
+    query='tags: ("apache_access_log") AND @source_host: /s.*/ AND request: "Special:WikiFactory"', limit=2000)
+
+print json.dumps(rows, indent=True)

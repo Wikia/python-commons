@@ -25,16 +25,16 @@ class Kibana(object):
     # seconds in 24h used to get the es index for yesterday
     DAY = 86400
 
-    ELASTICSEARCH_HOST = 'logs-prod.es.service.sjc.consul'
-    ELASTICSEARCH_INDEX_PREFIX = 'logstash-other'  # it's followed by the date (ex. logstash-other-2017.05.09)
+    ELASTICSEARCH_HOST = 'logs-prod.es.service.sjc.consul'  # ES5
 
     """ Interface for querying Kibana's storage """
-    def __init__(self, since=None, period=900, es_host=None, read_timeout=10):
+    def __init__(self, since=None, period=900, es_host=None, read_timeout=10, index_prefix='logstash-other'):
         """
         :type since int
         :type period int
         :type es_host str
         :type read_timeout int
+        :type index_prefix str
 
         :arg since: UNIX timestamp data should be fetched since
         :arg period: period (in seconds) before now() to be used when since is empty (defaults to last 15 minutes)
@@ -60,19 +60,25 @@ class Kibana(object):
         # Elasticsearch index to query
         # from today and yesterday
         self._index = ','.join([
-            self.format_index(now-self.DAY),
-            self.format_index(now),
+            self.format_index(index_prefix, now-self.DAY),
+            self.format_index(index_prefix, now),
         ])
 
         self._logger.info("Using {} indices".format(self._index))
         self._logger.info("Querying for messages from between {} and {}".
                           format(self.format_timestamp(self._since), self.format_timestamp(self._to)))
 
-    def format_index(self, ts):
-        # ex. logstash-other-2017.05.09
+    @staticmethod
+    def format_index(prefix, ts):
+        """
+        :type prefix str
+        :type ts int
+        :rtype: str
+        """
         tz_info = tz.tzutc()
-        return "{prefix}-{date}".format(
-            prefix=self.ELASTICSEARCH_INDEX_PREFIX, date=datetime.fromtimestamp(ts, tz=tz_info).strftime('%Y.%m.%d'))
+
+        # ex. logstash-other-2017.05.09
+        return "{prefix}-{date}".format(prefix=prefix, date=datetime.fromtimestamp(ts, tz=tz_info).strftime('%Y.%m.%d'))
 
     @staticmethod
     def format_timestamp(ts):
