@@ -135,7 +135,8 @@ class Kibana(object):
         )
 
         # get only requested amount of entries and cast them to a list
-        rows = list(islice(rows, 0, limit))
+        rows = islice(rows, 0, limit)
+        rows = [entry['_source'] for entry in rows]  # get data
 
         self._logger.info("{:d} rows returned".format(len(rows)))
         return rows
