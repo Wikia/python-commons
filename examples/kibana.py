@@ -12,9 +12,6 @@ from wikia.common.kibana import Kibana
 logging.basicConfig(level=logging.INFO)
 source = Kibana(period=3600)
 
-rows = source.get_rows(match={"tags": 'edge-cache-requestmessage'}, limit=5000)  # fetch many rows
-print(len(rows))
-
 rows = source.get_rows(match={"tags": 'edge-cache-requestmessage'})
 print json.dumps(rows, indent=True)
 
