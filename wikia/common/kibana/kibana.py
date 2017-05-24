@@ -52,7 +52,7 @@ class Kibana(object):
             since = now - period
         else:
             since += 1
-            self._logger.info("Using provided {:d} timestamp as since ({:d} seconds ago)".format(since, now - since))
+            self._logger.info("Using provided {0} timestamp as since ({1} seconds ago)".format(since, now - since))
 
         self._since = since
         self._to = now - self.SHORT_DELAY  # give logs some time to reach Logstash
