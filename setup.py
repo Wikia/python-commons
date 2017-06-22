@@ -36,7 +36,7 @@ for filename in ['__init__.py', 'build.json', 'README.rst']:
 
 # Define initial params
 setup_params = {
-    'name': 'wikia.common.' + pkg_name,
+    'name': 'wikia-common-' + pkg_name,
     'author': 'Wikia Engineering',
     'author_email': 'techteam-l@wikia-inc.com',
     'url': 'https://github.com/Wikia/python-commons/tree/master/wikia/common/' + pkg_name,
