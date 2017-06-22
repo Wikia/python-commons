@@ -5,6 +5,6 @@
         "MySQL-python==1.2.5",
         "PyYAML==3.11",
         "six==1.10.0",
-        "wikia.common.logger==1.0.2"
+        "wikia-common-logger==1.0.2"
     ]
 }
