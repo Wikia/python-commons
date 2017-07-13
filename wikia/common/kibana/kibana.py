@@ -178,3 +178,90 @@ class Kibana(object):
     def get_to_timestamp(self):
         """ Return the upper time boundary to returned data """
         return self._to
+
+    def get_aggregations(self, query, group_by, stats_field, percents=(50, 95, 99, 99.9)):
+        """
+        Returns aggregations (rows count + percentile stats) for a given query
+
+        This is basically the same as the following pseudo-SQL query:
+        SELECT PERCENTILE(stats_field, 75) FROM query GROUP BY group_by
+
+        https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-stats-aggregation.html
+
+        Please note that group_by should be provided by a "keyword" field:
+
+        Fielddata is disabled on text fields by default. Set fielddata=true on [@context.caller] in order to load
+        fielddata in memory by uninverting the inverted index. Note that this can however use significant memory.\
+        Alternatively use a keyword field instead.
+
+        :type query str
+        :type group_by str
+        :type stats_field str
+        :type percents set
+        :rtype: dict
+        """
+        body = {
+            "query": {
+                "bool": {
+                    "must": [{
+                        "query_string": {
+                            "query": query,
+                        },
+                    }]
+                },
+            },
+            "aggregations": {
+                "group_by_agg": {
+                    "terms": {
+                        "field": group_by
+                    },
+                    "aggregations": {
+                        "field_stats": {
+                            "percentiles": {
+                                "field": stats_field,
+                                "percents": percents
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        # add @timestamp range
+        body['query']['bool']['must'].append(self._get_timestamp_filer())
+
+        self._logger.info("Getting aggregations for {} field when grouped by {}".format(group_by, stats_field))
+
+        res = self._es.search(
+            body=body,
+            index=self._index,
+            size=0,  # we don need any rows from the index, stats is all we need here
+        )
+
+        # print(json.dumps(res, indent=True))
+
+        aggs = {}
+
+        """
+        bucket = {
+            "field_stats": {
+                "values": {
+                    "95.0": 20.99858477419025,
+                    "99.0": 67.0506954238478,
+                    "50.0": 1.0,
+                    "99.9": 146.3865495436944
+                }
+            },
+            "key": "Wikia\\Service\\Gateway\\ConsulUrlProvider:getUrl",
+            "doc_count": 8912859
+        }
+        """
+        for bucket in res['aggregations']['group_by_agg']['buckets']:
+            entry = {
+                "count": bucket['doc_count']
+            }
+            entry.update(bucket['field_stats']['values'])
+
+            aggs[bucket['key']] = entry
+
+        return aggs
