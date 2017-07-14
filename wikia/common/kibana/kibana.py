@@ -179,14 +179,15 @@ class Kibana(object):
         """ Return the upper time boundary to returned data """
         return self._to
 
-    def get_aggregations(self, query, group_by, stats_field, percents=(50, 95, 99, 99.9)):
+    def get_aggregations(self, query, group_by, stats_field, percents=(50, 95, 99, 99.9), size=100):
         """
         Returns aggregations (rows count + percentile stats) for a given query
 
         This is basically the same as the following pseudo-SQL query:
-        SELECT PERCENTILE(stats_field, 75) FROM query GROUP BY group_by
+        SELECT PERCENTILE(stats_field, 75) FROM query GROUP BY group_by LIMIT size
 
-        https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-stats-aggregation.html
+        https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-bucket-terms-aggregation.html
+        https://www.elastic.co/guide/en/elasticsearch/reference/5.5/search-aggregations-metrics-percentile-aggregation.html
 
         Please note that group_by should be provided by a "keyword" field:
 
@@ -198,6 +199,7 @@ class Kibana(object):
         :type group_by str
         :type stats_field str
         :type percents set
+        :type size int
         :rtype: dict
         """
         body = {
@@ -213,7 +215,8 @@ class Kibana(object):
             "aggregations": {
                 "group_by_agg": {
                     "terms": {
-                        "field": group_by
+                        "field": group_by,
+                        "size": size,  # how many term buckets should be returned out of the overall terms list
                     },
                     "aggregations": {
                         "field_stats": {
