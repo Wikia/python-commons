@@ -28,20 +28,25 @@ class Kibana(object):
     ELASTICSEARCH_HOST = 'logs-prod.es.service.sjc.consul'  # ES5
 
     """ Interface for querying Kibana's storage """
-    def __init__(self, since=None, period=900, es_host=None, read_timeout=10, index_prefix='logstash-other'):
+    def __init__(self, since=None, period=900, es_host=None, read_timeout=10, index_prefix='logstash-other',
+                 batch_size=1000):
         """
         :type since int
         :type period int
         :type es_host str
         :type read_timeout int
         :type index_prefix str
+        :type batch_size int
 
         :arg since: UNIX timestamp data should be fetched since
         :arg period: period (in seconds) before now() to be used when since is empty (defaults to last 15 minutes)
         :arg es_host: customize Elasticsearch host(s) that should be used for querying
         :arg read_timeout: customize Elasticsearch read timeout (defaults to 10 s)
+        :arg index_prefix name of the Elasticsearch index (defaults to 'logstash-other')
+        :arg batch_size size of the batch sent in every requests of the ELK scroll API (defaults to 1000)
         """
         self._es = Elasticsearch(hosts=es_host if es_host else self.ELASTICSEARCH_HOST, timeout=read_timeout)
+        self._batch_size = batch_size
 
         self._logger = logging.getLogger('kibana')
 
@@ -101,12 +106,16 @@ class Kibana(object):
             }
         }
 
-    def _search(self, query, limit=50000):
+    def _search(self, query, limit=50000, sampling=None):
         """
         Perform the search and return raw rows
 
         :type query object
         :type limit int
+        :type sampling int or None
+
+        :arg sampling: Percentage of results to be returned (0,100)
+
         :rtype: list
         """
         body = {
@@ -124,6 +133,20 @@ class Kibana(object):
         # @see https://discuss.elastic.co/t/elasticsearch-watcher-error-for-range-query/70347/2
         body['query']['bool']['must'].append(self._get_timestamp_filer())
 
+        # sample the results if needed
+        if sampling is not None:
+            body['query']['bool']['must'].append({
+                'script': {
+                    'script': {
+                        'lang': 'painless',
+                        'inline': "Math.abs(doc['_uid'].value.hashCode()) % 100 < params.sampling",
+                        'params': {
+                            'sampling': sampling
+                        }
+                    }
+                }
+            })
+
         self._logger.debug("Running {} query (limit set to {:d})".format(json.dumps(body), body.get('size', 0)))
 
         # use Scroll API to be able to fetch more than 10k results and prevent "search_phase_execution_exception":
@@ -137,7 +160,7 @@ class Kibana(object):
             index=self._index,
             query=body,
             sort=["_doc"],  # return the next batch of results from every shard that still has results to return.
-            size=1000,  # batch size
+            size=self._batch_size,  # batch size
         )
 
         # get only requested amount of entries and cast them to a list
@@ -147,25 +170,29 @@ class Kibana(object):
         self._logger.info("{:d} rows returned".format(len(rows)))
         return rows
 
-    def get_rows(self, match, limit=10):
+    def get_rows(self, match, limit=10, sampling=None):
         """
         Returns raw rows that matches given query
 
         :arg match: query to be run against Kibana log messages (ex. {"@message": "Foo Bar DB queries"})
         :arg limit: the number of results (defaults to 10)
+        :type sampling int or None
+        :arg sampling: Percentage of results to be returned (0,100)
         """
         query = {
             "match": match,
         }
 
-        return self._search(query, limit)
+        return self._search(query, limit, sampling)
 
-    def query_by_string(self, query, limit=10):
+    def query_by_string(self, query, limit=10, sampling=None):
         """
         Returns raw rows that matches the given query string
 
         :arg query: query string to be run against Kibana log messages (ex. @message:"^PHP Fatal").
         :arg limit: the number of results (defaults to 10)
+        :type sampling int or None
+        :arg sampling: Percentage of results to be returned (0,100)
         """
         query = {
             "query_string": {
@@ -173,7 +200,7 @@ class Kibana(object):
             }
         }
 
-        return self._search(query, limit)
+        return self._search(query, limit, sampling)
 
     def get_to_timestamp(self):
         """ Return the upper time boundary to returned data """
