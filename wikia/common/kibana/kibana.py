@@ -139,7 +139,10 @@ class Kibana(object):
                 'script': {
                     'script': {
                         'lang': 'painless',
-                        'inline': "Math.abs(doc['_uid'].value.hashCode()) %% 100 < %d" % sampling
+                        'inline': "Math.abs(doc['_uid'].value.hashCode()) % 100 < params.sampling",
+                        'params': {
+                            'sampling': sampling
+                        }
                     }
                 }
             })
