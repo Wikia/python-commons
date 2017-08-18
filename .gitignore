@@ -7,7 +7,7 @@ venv/
 *.iml
 .idea
 *.swp
-
+.DS_Store
 coverage.xml
 env/
 htmlcov/
