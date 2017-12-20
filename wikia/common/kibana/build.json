@@ -1,6 +1,6 @@
 {
     "version": "2.2.3",
-    "description": "Run queries against Kibana's Elasticsearch 5",
+    "description": "Run queries against Kibana's Elasticsearch 6",
     "install_requires": [
         "elasticsearch>=6.0.0,<7.0.0",
         "python-dateutil==2.2"
