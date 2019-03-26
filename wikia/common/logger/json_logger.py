@@ -48,15 +48,17 @@ class WikiaJsonLogsFormatter(pythonjsonlogger.jsonlogger.JsonFormatter):
         log_record['instance_id'] = self.instance_id
 
 
-def configure(app_name, version, level):
+def configure(app_name, version, level, formatter_config=None):
     """
     configures Python logging module to output json messages
 
     :param app_name: name of the application that will be put into logs
     :param version: application version
     :param level: logging level
+    :param formatter_config: customized formatter parametes, can override the formatter
+        class and alter constructor parameters
     """
-    logging.config.dictConfig({
+    cfg = {
         'version': 1,
         'disable_existing_loggers': False,
         'handlers': {
@@ -82,4 +84,7 @@ def configure(app_name, version, level):
                 'propagate': True
             }
         }
-    })
+    }
+    if formatter_config is not None:
+        cfg['formatters']['wikiaLogsFormatter'].update(formatter_config)
+    logging.config.dictConfig(cfg)
