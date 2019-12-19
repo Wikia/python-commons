@@ -10,7 +10,7 @@ You can use ``WikiaJsonLogsFormatter`` as a convenient way of logging from k8s p
   
 Add to ``requirements.txt``::
 
-  wikia-common-logger==1.0.2
+  wikia-common-logger==1.0.4
 
 Install requirements in your ``Dockerfile``::
   
