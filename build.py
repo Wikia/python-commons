@@ -50,7 +50,7 @@ def main(args=sys.argv[1:]):
         proc = subprocess.Popen(command_args, shell=False, cwd=here, env=environ)
         proc.communicate()
     elif command == 'upload':
-        command_args = [sys.executable, 'setup.py', 'sdist', 'upload', '-r', 'wikia']
+        command_args = [sys.executable, 'setup.py', 'sdist', 'upload', '-r', 'artifactory']
         proc = subprocess.Popen(command_args, shell=False, cwd=here, env=environ)
         proc.communicate()
 
