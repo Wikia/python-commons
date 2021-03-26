@@ -1,7 +1,7 @@
 {
-    "version": "1.0.4",
+    "version": "1.0.5a",
     "description": "Common logging classes for centralized logging at Wikia",
     "install_requires": [
-        "python-json-logger==0.1.8"
+        "python-json-logger~=0.1"
     ]
 }
