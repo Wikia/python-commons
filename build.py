@@ -24,9 +24,13 @@ import subprocess
 import sys
 
 
+def is_venv():
+    return hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
+
+
 def main(args=sys.argv[1:]):
     """Wrapper around setup.py and pip for individual packages."""
-    if not hasattr(sys, 'real_prefix'):
+    if not is_venv():
         return 'ERROR: Must be run from within a virtual environment'
 
     if (len(args) != 2 or
