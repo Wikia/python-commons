@@ -7,10 +7,10 @@ from datetime import datetime
 import logging.config
 import time
 
-import pythonjsonlogger.jsonlogger
+import pythonjsonlogger.json
 
 
-class WikiaJsonLogsFormatter(pythonjsonlogger.jsonlogger.JsonFormatter):
+class WikiaJsonLogsFormatter(pythonjsonlogger.json.JsonFormatter):
     """
     Formats json log entries
 
@@ -32,7 +32,7 @@ class WikiaJsonLogsFormatter(pythonjsonlogger.jsonlogger.JsonFormatter):
     def add_fields(self, log_record, record, message_dict):
         super(WikiaJsonLogsFormatter, self).add_fields(log_record, record, message_dict)
         if not log_record.get('@timestamp'):
-            log_record['@timestamp'] = datetime.utcfromtimestamp(record.created).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+            log_record['@timestamp'] = datetime.fromtimestamp(record.created).strftime('%Y-%m-%dT%H:%M:%S.%fZ')
 
         if log_record.get('level'):
             log_record['level'] = log_record['level']
@@ -51,12 +51,7 @@ class WikiaJsonLogsFormatter(pythonjsonlogger.jsonlogger.JsonFormatter):
 def configure(app_name, version, level, formatter_config=None):
     """
     configures Python logging module to output json messages
-
-    :param app_name: name of the application that will be put into logs
-    :param version: application version
-    :param level: logging level
-    :param formatter_config: customized formatter parametes, can override the formatter
-        class and alter constructor parameters
+    ...
     """
     cfg = {
         'version': 1,
@@ -74,7 +69,7 @@ def configure(app_name, version, level, formatter_config=None):
                 '()': WikiaJsonLogsFormatter,
                 'appname': app_name,
                 'version': version,
-                'fmt': '(@timestamp) (level) (name) (@message) (message)'
+                'format': '%(@timestamp)s %(level)s %(name)s %(message)s'
             }
         },
         'loggers': {
